@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Application = require('../models/application');
 
+const { protect } = require('../middleware/auth-middleware');
+
+router.use(protect);
+
 //CREATE
 router.post('/', async (req, res) => {
     try{
