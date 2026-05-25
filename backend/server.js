@@ -13,7 +13,12 @@ const userRoutes = require('./routes/user-routes');
 
 dotenv.config();
 
-app.use(cors());
+app.use(cors(
+    {
+        origin : 'http://localhost:5173',
+        credentials: true
+    }
+));
 app.use(bodyParser.json());
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/jobs', jobRoutes);
