@@ -9,7 +9,8 @@ router.use(protect);
 //CREATE
 router.post('/', async (req, res) => {
     try{
-        const newApplication = new Application(req.body);
+        const applicationData = { ...req.body, user: req.user.id };
+        const newApplication = new Application(applicationData);
         const savedApplication = await newApplication.save();
         res.status(201).json(savedApplication);
     }catch(err){
@@ -20,7 +21,7 @@ router.post('/', async (req, res) => {
 //READ ALL
 router.get('/', async (req, res) => {
     try{
-        const applications = await Application.find().sort({appliedDate: -1 });
+        const applications = await Application.find({ user: req.user.id }).sort({ createdAt: -1 });
         res.status(200).json(applications);
     }catch(err){
         res.status(500).json({ error: 'Failed to fetch applications', details: err.message });

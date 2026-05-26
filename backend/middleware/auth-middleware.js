@@ -10,13 +10,13 @@ const protect = (req, res, next) => {
 
             req.user = decoded;
 
-            next();
+            return next();
         }catch(err){
-            res.status(401).json({error: 'Not authorized'});
+            return res.status(401).json({error: 'Not authorized'});
         }
     }
     if(!token){
-        res.status(401).json({error: 'Not authorized'});
+        return res.status(401).json({error: 'Not authorized'});
     }
 }
 

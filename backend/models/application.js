@@ -12,7 +12,7 @@ const ApplicationSchema = new mongoose.Schema({
     status : {
         type: String,
         enum: ['Applied', 'OA','Interview', 'Offer', 'Rejected', 'Accepted'],
-        default: 'Applied'
+        default: 'Applied', required : true
     },
     salaryRange : {
         min : { type: Number },
@@ -20,7 +20,7 @@ const ApplicationSchema = new mongoose.Schema({
         currency : { type: String , default: 'INR' },
     },
     location : { 
-        country : { type: String, required: true },
+        country : { type: String },
         city : { type: String }
     },
     portalLink : { type: String },

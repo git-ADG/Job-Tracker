@@ -49,7 +49,6 @@ const Dashboard = () => {
             <div style={{padding : '20px'}}>loading tech roles</div>
         );
     }
-    {console.log(jobs)}
     return (
         <div className='dashboard-container' style={{padding : '20px', fontFamily : 'sans-serif'}}>
             <header style={{borderBottom : '2px solid #eee', paddingBottom : '10px', marginBottom : '20px'}}>
