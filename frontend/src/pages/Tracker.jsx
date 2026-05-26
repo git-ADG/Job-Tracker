@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTFiNWExZWEyMmMwY2NhZjRhYWYwZCIsImlhdCI6MTc3OTc4Nzc0OCwiZXhwIjoxNzgyMzc5NzQ4fQ.IV-9aO2PFjoFjs5oYg182jm5YOEFtVuwaODVQBbOI-0";
 
 const Tracker = () => {
     const [applications, setApplications] = useState([]);
@@ -12,6 +12,16 @@ const Tracker = () => {
        role : '',
        status : 'Applied' 
     });
+
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+        if (!localStorage.getItem('token')) {
+        navigate('/login');
+        }
+    }, [navigate]);
+
+    const token = localStorage.getItem('token');
 
     const handleChange = (e) => {
         setFormData({
@@ -26,7 +36,7 @@ const Tracker = () => {
             const response = await axios.post("http://localhost:5000/api/applications", formData,
                 {
                     headers: {
-                        Authorization : `Bearer ${TEST_TOKEN}`
+                        Authorization : `Bearer ${token}`
                     }
                 }
             );
@@ -38,7 +48,7 @@ const Tracker = () => {
             });
         }catch(err){
             console.error("Backend Error Details:", err.response?.data);
-            alert(`Failed to save: ${err.response?.data?.details || err.message}`);
+            alert(`Failed to save: ${err.response?.data || err.message}`);
         }
     }
 
@@ -47,7 +57,7 @@ const Tracker = () => {
             await axios.put(`http://localhost:5000/api/applications/${id}`, {status: newStatus},
                 {
                     headers : {
-                        Authorization : `Bearer ${TEST_TOKEN}`
+                        Authorization : `Bearer ${token}`
                     }
                 }
             );
@@ -62,7 +72,7 @@ const Tracker = () => {
         if(!window.confirm("are you sure you want to delete")) return;
         try{
             await axios.delete(`http://localhost:5000/api/applications/${id}`, {headers: {
-                Authorization : `Bearer ${TEST_TOKEN}`
+                Authorization : `Bearer ${token}`
             }});
             setApplications(applications.filter((app) => app._id != id));
         }catch(err){
@@ -77,7 +87,7 @@ const Tracker = () => {
                 try{
                     const response = await axios.get("http://localhost:5000/api/applications", {
                         headers: {
-                            Authorization : `Bearer ${TEST_TOKEN}`
+                            Authorization : `Bearer ${token}`
                         }
                     });
                     setApplications(response.data);

@@ -26,6 +26,6 @@ const ApplicationSchema = new mongoose.Schema({
     portalLink : { type: String },
     notes : { type: String },
     appliedDate : { type: Date, default: Date.now },
-});
+}, {timestamps : true});
 
 module.exports = mongoose.model('Application', ApplicationSchema);

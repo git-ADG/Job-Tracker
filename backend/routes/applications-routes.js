@@ -21,7 +21,8 @@ router.post('/', async (req, res) => {
 //READ ALL
 router.get('/', async (req, res) => {
     try{
-        const applications = await Application.find({ user: req.user.id }).sort({ createdAt: -1 });
+        console.log("Backend received request for User ID:", req.user.id);
+        const applications = await Application.find({ user: req.user.id }).sort({ appliedDate: -1 });
         res.status(200).json(applications);
     }catch(err){
         res.status(500).json({ error: 'Failed to fetch applications', details: err.message });
