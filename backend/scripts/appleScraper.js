@@ -6,9 +6,7 @@ const path = require('path');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
-const MONGO_URI = process.env.MONGO_URI 
-    ? process.env.MONGO_URI.toLowerCase() 
-    : 'mongodb://127.0.0.1:27017/jobtracker';
+const MONGO_URI = process.env.MONGO_URI;
 
 const scrapeAppleJobs = async () => {
     console.log("Initiating POST request to Apple Jobs API...");
