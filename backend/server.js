@@ -9,15 +9,21 @@ const PORT = process.env.PORT || 5000;
 const applicationsRoutes = require('./routes/applications-routes');
 const jobRoutes = require('./routes/job-routes');
 const userRoutes = require('./routes/user-routes');
-
+const jobPostingRoutes = require('./routes/job-posting-routes');
 
 dotenv.config();
 
-app.use(cors());
+app.use(cors(
+    {
+        origin : 'http://localhost:5173',
+        credentials: true
+    }
+));
 app.use(bodyParser.json());
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/job-posting', jobPostingRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('Connected to MongoDB'))

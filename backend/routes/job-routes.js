@@ -3,14 +3,14 @@ const router = express.Router();
 const axios = require('axios');
 
 router.get('/search', async (req, res) => {
-    const {query} = req.query;
+    const {query, page} = req.query;
     try{
         const options = {
             method: 'GET',
             url: 'https://jsearch.p.rapidapi.com/search',
             params: {
             query: query || 'Software Engineer fresher India',
-            page: '1',
+            page: page || '1',
             num_pages: '1',
             date_posted: 'month'
             },
@@ -19,7 +19,9 @@ router.get('/search', async (req, res) => {
                 'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
             }
         };
+        //console.log("Sending options to RapidAPI:", options.params);
         const response = await axios.request(options);
+        //console.log(response.data.data);
         res.status(200).json(response.data.data);
     }catch(err){
         console.error('Error fetching jobs:', err.message);
