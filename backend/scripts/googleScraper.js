@@ -84,13 +84,10 @@ const scrapeGoogleJobs = async () => {
     const actualJobData = JSON.parse(parsedEnvelope[0][2]);
     let jobList = [];
 
-    // THE FIX: Recursive Array Hunter
-    // This digs through Google's nested arrays to find the exact list of jobs
     const extractJobs = (data) => {
         if (!Array.isArray(data)) return;
         
-        // If it looks like a list of jobs (index 1 is a string title, index 7 is Company)
-        if (data.length > 0 && Array.isArray(data[0]) && typeof data[0]?.[1] === 'string' && (data[0]?.[7] === 'Google' || data[0]?.[7] === 'YouTube')) {
+        if (data.length > 0 && Array.isArray(data[0]) && typeof data[0]?.[1] === 'string' && (data[0]?.[7] === 'Google' || data[0]?.[7] === 'YouTube' || data[0]?.[7] === 'Google DeepMind')) {
             if (data.length > jobList.length) {
                 jobList = data; // Save the longest valid array we find
             }
@@ -104,7 +101,6 @@ const scrapeGoogleJobs = async () => {
 
     extractJobs(actualJobData);
 
-    // THE FIX: Precise Index Mapping
     const formattedJobs = jobList
         .filter(job => job && Array.isArray(job) && job.length > 5)
         .map(job => {
@@ -146,4 +142,6 @@ const scrapeGoogleJobs = async () => {
   }
 };
 
-scrapeGoogleJobs();
+module.exports = scrapeGoogleJobs;
+
+// module.exports = scrapeGoogleJobs;

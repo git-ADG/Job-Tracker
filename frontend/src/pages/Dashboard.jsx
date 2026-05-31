@@ -39,10 +39,9 @@ const Dashboard = () => {
             }
 
             const applicationData = {
-                company: job.companyName,
+                companyName: job.companyName,
                 role: job.role,
-                status: 'Saved',
-                dateApplied: null 
+                status: 'Applied', 
             };
 
             await axios.post('http://localhost:5000/api/applications', applicationData, {
