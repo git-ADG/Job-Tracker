@@ -39,6 +39,23 @@ app.get('/', (req, res) => {
     res.json({status:'online', message: 'Welcome to the Job Tracker API' });
 });
 
+app.post('/api/admin/force-scrape', auth, async (req, res) => {
+    try {
+        console.log(`⚠️ [ADMIN] Manual scrape triggered by user: ${req.user.id}`);
+
+        runAllScrapers(); 
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Global Scrape Sequence initiated. The database is being refreshed." 
+        });
+
+    } catch (err) {
+        console.error("Manual Scrape Error:", err.message);
+        res.status(500).json({ error: "Failed to initiate scraper." });
+    }
+});
+
 cron.schedule('0 8,20 * * *', () => {
     console.log("⏰ [CRON] Triggering Bi-Daily Scrape Sequence (IST)...");
     runAllScrapers();
