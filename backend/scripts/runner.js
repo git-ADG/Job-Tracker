@@ -27,7 +27,8 @@ const transporter = nodemailer.createTransport({
         rejectUnauthorized: false 
     },
     pool: true,
-    connectionTimeout: 15000
+    connectionTimeout: 15000,
+    family : 4
 });
 
 const sendEmailReport = async (summaryHtml, isError = false) => {
