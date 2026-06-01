@@ -81,6 +81,28 @@ const Tracker = () => {
         }
     }
 
+    const handleForceScrape = async () => {
+        const isConfirmed = window.confirm(
+            "⚠️ COMMAND OVERRIDE: This will instantly purge all closed jobs and trigger a global FAANG scrape. It takes roughly 30 seconds. Proceed?"
+        );
+        
+        if (!isConfirmed) return;
+
+        try {
+            // We alert first so the UI feels responsive
+            alert("🚀 Scrape initiated! You will receive an email report once the pipeline finishes.");
+            
+            await axios.post(`${API_URI}/api/admin/force-scrape`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+        } catch (err) {
+            console.error(err);
+            alert("Failed to trigger the master scraper.");
+        }
+    };
+
     if (loading) {
         return (
             <div style={{ padding: '20px' }}>Loading your applications...</div>
@@ -89,9 +111,38 @@ const Tracker = () => {
 
     return (
         <div className='tracker-container' style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-            <header style={{ borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>
-                <h1>Applications Tracker</h1>
-                <p>Manage and track off-campus job hunt</p>
+            <header style={{ 
+                borderBottom: '2px solid #eee', 
+                paddingBottom: '15px', 
+                marginBottom: '20px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <div>
+                    <h1 style={{ margin: '0 0 5px 0' }}>Applications Tracker</h1>
+                    <p style={{ margin: 0, color: '#666' }}>Manage and track off-campus job hunt</p>
+                </div>
+                
+                {/* God Mode Button */}
+                <button 
+                    onClick={handleForceScrape}
+                    style={{ 
+                        padding: '10px 20px', 
+                        backgroundColor: '#1a1a1a', 
+                        color: '#00ffcc', 
+                        border: '1px solid #00ffcc', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold',
+                        fontFamily: 'monospace',
+                        boxShadow: '0 0 10px rgba(0, 255, 204, 0.2)'
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#333'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#1a1a1a'}
+                >
+                    FORCE SCRAPE
+                </button>
             </header>
 
             <form onSubmit={handleSubmit}
