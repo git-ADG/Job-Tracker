@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard';
 import Tracker from './pages/Tracker';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import KanbanBoard from './pages/KanbanBoard';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Navigation = () => {
       <div style={{display : 'flex', gap: '20px'}}>
         <Link to= "/" style={{color : 'white', textDecoration : 'none', fontWeight : 'bold'}}>Job Board</Link>
         {token && <Link to= "/tracker" style={{color : 'white', textDecoration: 'none', fontWeight : 'bold'}}>Applications</Link>}
+        {token && <Link to= "/tracking-board" style={{color : 'white', textDecoration: 'none', fontWeight : 'bold'}}>Applications Board</Link>}
       </div>
       {token ? (
           <button onClick={handleLogout} style={{ background: 'transparent', color: 'white', border: '1px solid white', padding: '5px 10px', cursor: 'pointer' }}>Logout</button>
@@ -40,6 +42,7 @@ const App = () => {
         <Route path='/tracker' element = { <Tracker /> } />
         <Route path='/register' element = { <Register /> } />
         <Route path='/login' element = { <Login /> } />
+        <Route path='/tracking-board' element = { <KanbanBoard /> } />
       </Routes>
     </BrowserRouter>
   );
