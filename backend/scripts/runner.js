@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
         rejectUnauthorized: false 
     },
     pool: true,
-    connectionTimeout: 15000,
+    connectionTimeout: 60000,
     family : 4
 });
 

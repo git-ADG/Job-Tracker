@@ -14,13 +14,6 @@ const Tracker = () => {
         status: 'Applied'
     });
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!localStorage.getItem('token')) {
-            navigate('/login');
-        }
-    }, [navigate]);
 
     const token = localStorage.getItem('token');
 
