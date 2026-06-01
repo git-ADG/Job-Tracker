@@ -13,6 +13,7 @@ const userRoutes = require('./routes/user-routes');
 const jobPostingRoutes = require('./routes/job-posting-routes');
 
 const runAllScrapers = require('./scripts/runner');
+const {protect} = require('./middleware/auth-middleware');
 
 dotenv.config();
 
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
     res.json({status:'online', message: 'Welcome to the Job Tracker API' });
 });
 
-app.post('/api/admin/force-scrape', auth, async (req, res) => {
+app.post('/api/admin/force-scrape', protect , async (req, res) => {
     try {
         console.log(`⚠️ [ADMIN] Manual scrape triggered by user: ${req.user.id}`);
 
