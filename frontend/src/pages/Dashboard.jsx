@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 
+const API_URI = import.meta.env.VITE_API_URL;
+
 const Dashboard = () => {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ const Dashboard = () => {
     const fetchJobs = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:5000/api/job-posting');
+            const response = await axios.get(`${API_URI}/api/job-posting`);
             setJobs(response.data);
             setLoading(false);
         } catch (err) {
@@ -44,7 +46,7 @@ const Dashboard = () => {
                 status: 'Applied', 
             };
 
-            await axios.post('http://localhost:5000/api/applications', applicationData, {
+            await axios.post(`${API_URI}/api/applications`, applicationData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
