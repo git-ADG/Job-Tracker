@@ -1,4 +1,5 @@
 import {BrowserRouter, Routes, Route, Link, useNavigate} from 'react-router-dom';
+import ProtectedRoute from './components/protectedRoutes';
 import Dashboard from './pages/Dashboard';
 import Tracker from './pages/Tracker';
 import Register from './pages/Register';
@@ -39,7 +40,11 @@ const App = () => {
       <Navigation />
       <Routes>
         <Route path='/' element = { <Dashboard /> } />
-        <Route path='/tracker' element = { <Tracker /> } />
+        <Route path='/tracker' element = { 
+          <ProtectedRoute>
+            <Tracker />
+          </ProtectedRoute>
+         } />
         <Route path='/register' element = { <Register /> } />
         <Route path='/login' element = { <Login /> } />
         {/* <Route path='/tracking-board' element = { <KanbanBoard /> } /> */}

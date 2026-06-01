@@ -52,7 +52,7 @@ const KanbanBoard = ({ applications, setApplications, handleDelete }) => {
     };
 
     return (
-        <div style={{ display: 'flex', gap: '15px', overflowX: 'auto', paddingBottom: '10px' }}>
+        <div className='kanban-scroll-container' style={{ display: 'flex', gap: '15px', overflowX: 'auto', paddingBottom: '10px' }}>
             <DragDropContext onDragEnd={onDragEnd}>
                 {COLUMNS.map((columnId) => (
                     <div 
