@@ -59,6 +59,38 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+//UPDATE STATUS
+router.put('/:id/status', auth, async (req, res) => {
+    try {
+        const { status } = req.body;
+        const applicationId = req.params.id;
+
+        const validStatuses = ['Applied', 'OA', 'Interview', 'Offer', 'Rejected', 'Accepted'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ error: "Invalid status column." });
+        }
+
+        let application = await Application.findById(applicationId);
+        
+        if (!application) {
+            return res.status(404).json({ error: "Application not found." });
+        }
+
+        if (application.user.toString() !== req.user.id) {
+            return res.status(401).json({ error: "Not authorized to modify this application." });
+        }
+
+        application.status = status;
+        await application.save();
+
+        res.json({ success: true, application });
+
+    } catch (err) {
+        console.error("Status Update Error:", err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
 //DELETE
 router.delete('/:id', async (req, res) => {
     try{
