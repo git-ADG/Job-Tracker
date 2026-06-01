@@ -5,13 +5,13 @@ const path = require('path');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
-const MONGO_URI = process.env.MONGO_URI;
+//const MONGO_URI = process.env.MONGO_URI;
 
 const leverCompanies = ['atlassian', 'razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'github'];
 
 const scrapeLeverJobs = async () => {
     console.log(`Initiating sweep across ${leverCompanies.length} Lever boards...`);
-    await mongoose.connect(MONGO_URI);
+    //await mongoose.connect(MONGO_URI);
 
     let totalAdded = 0;
 
@@ -83,10 +83,6 @@ const scrapeLeverJobs = async () => {
     }
 
     console.log(`\n🎉 Lever Sweep Complete! Inserted ${totalAdded} brand new jobs across all boards.`);
-    
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.disconnect();
-    }
 };
 
 module.exports = scrapeLeverJobs;

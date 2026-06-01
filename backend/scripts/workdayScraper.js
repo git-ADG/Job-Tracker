@@ -48,7 +48,7 @@ const workdayCompanies = [
 
 const scrapeWorkdayJobs = async () => {
     console.log(`Initiating internal API bypass across ${workdayCompanies.length} Workday boards...`);
-    await mongoose.connect(MONGO_URI);
+    //await mongoose.connect(MONGO_URI);
 
     let totalAdded = 0;
 
@@ -133,9 +133,6 @@ const scrapeWorkdayJobs = async () => {
 
     console.log(`\n🎉 Workday Sweep Complete! Inserted ${totalAdded} brand new jobs.`);
     
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.disconnect();
-    }
 };
 
 module.exports = scrapeWorkdayJobs;

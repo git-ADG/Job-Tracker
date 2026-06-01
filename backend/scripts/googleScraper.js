@@ -1,5 +1,5 @@
 const axios = require('axios');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -7,8 +7,8 @@ const JobPosting = require('../models/job-posting');
 
 dotenv.config({path : path.join(__dirname, '../.env')});
 
-const MONGO_URI = process.env.MONGO_URI;
-console.log("Database URI targeting:", MONGO_URI);
+//const MONGO_URI = process.env.MONGO_URI;
+//console.log("Database URI targeting:", MONGO_URI);
 
 const scrapeGoogleJobs = async () => {
   console.log("Initiating stealth batchexecute request to Google...");
@@ -120,7 +120,7 @@ const scrapeGoogleJobs = async () => {
 
     console.log(`[+] Found ${formattedJobs.length} pristine jobs. Connecting to Database...`);
 
-    await mongoose.connect(MONGO_URI);
+    //await mongoose.connect(MONGO_URI);
     
     let addedCount = 0;
     for (const job of formattedJobs) {
@@ -135,10 +135,6 @@ const scrapeGoogleJobs = async () => {
 
   } catch (error) {
     console.error("Request Failed:", error.message);
-  } finally {
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.disconnect();
-    }
   }
 };
 

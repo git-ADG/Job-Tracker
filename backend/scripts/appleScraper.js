@@ -1,12 +1,12 @@
 const axios = require('axios');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
-const MONGO_URI = process.env.MONGO_URI;
+//const MONGO_URI = process.env.MONGO_URI;
 
 const scrapeAppleJobs = async () => {
     console.log("Initiating POST request to Apple Jobs API...");
@@ -54,7 +54,7 @@ const scrapeAppleJobs = async () => {
 
         console.log(`[+] Found ${formattedJobs.length} pristine Apple jobs. Connecting to Database...`);
 
-        await mongoose.connect(MONGO_URI);
+        //await mongoose.connect(MONGO_URI);
         
         let addedCount = 0;
         for (const job of formattedJobs) {
@@ -69,10 +69,6 @@ const scrapeAppleJobs = async () => {
 
     } catch (error) {
         console.error("❌ Apple Request Failed:", error.message);
-    } finally {
-        if (mongoose.connection.readyState !== 0) {
-            await mongoose.disconnect();
-        }
     }
 };
 

@@ -1,12 +1,12 @@
 const axios = require('axios');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
-const MONGO_URI = process.env.MONGO_URI;
+//const MONGO_URI = process.env.MONGO_URI;
 
 const scrapeAmazonJobs = async () => {
     console.log("Initiating API request to Amazon Jobs...");
@@ -52,7 +52,7 @@ const scrapeAmazonJobs = async () => {
 
         // console.log(`[+] Found ${formattedJobs.length} pristine Amazon jobs. Connecting to Database...`);
 
-        await mongoose.connect(MONGO_URI);
+        //await mongoose.connect(MONGO_URI);
         
         let addedCount = 0;
         for (const job of formattedJobs) {
@@ -68,10 +68,6 @@ const scrapeAmazonJobs = async () => {
 
     } catch (error) {
         console.error("❌ Amazon Request Failed:", error.message);
-    } finally {
-        if (mongoose.connection.readyState !== 0) {
-            await mongoose.disconnect();
-        }
     }
 };
 

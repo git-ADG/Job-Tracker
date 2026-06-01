@@ -47,7 +47,7 @@ const scrapeMicrosoftJobs = async () => {
 
         console.log(`[+] Found ${formattedJobs.length} pristine Microsoft jobs. Connecting to Database...`);
 
-        await mongoose.connect(MONGO_URI);
+        //await mongoose.connect(MONGO_URI);
         
         let addedCount = 0;
         for (const job of formattedJobs) {
@@ -62,10 +62,6 @@ const scrapeMicrosoftJobs = async () => {
 
     } catch (error) {
         console.error("❌ Microsoft Request Failed:", error.message);
-    } finally {
-        if (mongoose.connection.readyState !== 0) {
-            await mongoose.disconnect();
-        }
     }
 };
 

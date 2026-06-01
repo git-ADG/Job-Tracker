@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
-const MONGO_URI = process.env.MONGO_URI;
+//const MONGO_URI = process.env.MONGO_URI;
 
 const greenhouseCompanies = ['stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'atlassian', 'razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'github'];
 
 const scrapeGreenhouseJobs = async () => {
     console.log(`Initiating sweep across ${greenhouseCompanies.length} Greenhouse boards...`);
-    await mongoose.connect(MONGO_URI);
+    //await mongoose.connect(MONGO_URI);
 
     let totalAdded = 0;
 
@@ -85,9 +85,6 @@ const scrapeGreenhouseJobs = async () => {
 
     console.log(`\n🎉 Greenhouse Sweep Complete! Inserted ${totalAdded} brand new jobs across all boards.`);
     
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.disconnect();
-    }
 };
 
 module.exports = scrapeGreenhouseJobs;
