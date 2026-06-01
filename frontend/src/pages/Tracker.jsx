@@ -92,7 +92,7 @@ const Tracker = () => {
             // We alert first so the UI feels responsive
             alert("🚀 Scrape initiated! You will receive an email report once the pipeline finishes.");
             
-            await axios.post(`${API_URI}/api/admin/force-scrape`, {}, {
+            await axios.post(`${API_URI}/api/admin/force-scrape`, {} , {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
