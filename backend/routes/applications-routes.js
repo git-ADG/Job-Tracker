@@ -60,7 +60,7 @@ router.put('/:id', async (req, res) => {
 });
 
 //UPDATE STATUS
-router.put('/:id/status', auth, async (req, res) => {
+router.put('/:id/status', async (req, res) => {
     try {
         const { status } = req.body;
         const applicationId = req.params.id;
