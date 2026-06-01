@@ -91,6 +91,33 @@ router.put('/:id/status', async (req, res) => {
     }
 });
 
+//UPDATE NOTES
+router.put('/:id/notes', async (req, res) => {
+    try {
+        const { notes } = req.body;
+        const applicationId = req.params.id;
+
+        let application = await Application.findById(applicationId);
+        
+        if (!application) {
+            return res.status(404).json({ error: "Application not found." });
+        }
+
+        const loggedInUserId = req.user.id;
+        if (application.user.toString() !== loggedInUserId.toString()) {
+            return res.status(401).json({ error: "Not authorized to modify this application." });
+        }
+        
+        application.notes = notes;
+        await application.save();
+
+        res.json({ success: true, application });
+    } catch (err) {
+        console.error("Notes Update Error:", err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
 //DELETE
 router.delete('/:id', async (req, res) => {
     try{
