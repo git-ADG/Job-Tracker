@@ -47,9 +47,9 @@ const scrapeAtlassianJobs = async () => {
                         companyName: 'Atlassian',
                         role: job.title,
                         location: Array.isArray(job.locations) ? job.locations.join(', ') : (job.location || 'India (Multiple)'),
-                        salary: 'Competitive', 
-                        portalLink: jobUrl,
-                        postedDate: new Date() 
+                        salaryRaw: 'Competitive', 
+                        applyLink: jobUrl,
+                        scrapedAt: new Date()
                     });
                     jobsAdded++;
                 }
