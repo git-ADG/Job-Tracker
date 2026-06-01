@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_URI = import.meta.env.VITE_API_URL;
+
 
 const Tracker = () => {
     const [applications, setApplications] = useState([]);
@@ -33,7 +35,7 @@ const Tracker = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const response = await axios.post("http://localhost:5000/api/applications", formData,
+            const response = await axios.post(`${API_URI}/api/applications`, formData,
                 {
                     headers: {
                         Authorization : `Bearer ${token}`
@@ -54,7 +56,7 @@ const Tracker = () => {
 
     const handleStatusChange = async (id, newStatus) => {
         try{
-            await axios.put(`http://localhost:5000/api/applications/${id}`, {status: newStatus},
+            await axios.put(`${API_URI}/api/applications/${id}`, {status: newStatus},
                 {
                     headers : {
                         Authorization : `Bearer ${token}`
@@ -71,7 +73,7 @@ const Tracker = () => {
     const handleDelete = async (id) => {
         if(!window.confirm("are you sure you want to delete")) return;
         try{
-            await axios.delete(`http://localhost:5000/api/applications/${id}`, {headers: {
+            await axios.delete(`${API_URI}/api/applications/${id}`, {headers: {
                 Authorization : `Bearer ${token}`
             }});
             setApplications(applications.filter((app) => app._id != id));
@@ -85,7 +87,7 @@ const Tracker = () => {
         () =>{
             const fetchApplications = async() => {
                 try{
-                    const response = await axios.get("http://localhost:5000/api/applications", {
+                    const response = await axios.get(`${API_URI}/api/applications`, {
                         headers: {
                             Authorization : `Bearer ${token}`
                         }
