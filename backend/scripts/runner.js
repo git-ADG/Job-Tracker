@@ -1,5 +1,5 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 const nodemailer = require('nodemailer');
@@ -42,14 +42,14 @@ const sendEmailReport = async (summaryHtml, isError = false) => {
 
 const clearDatabase = async () => {
     console.log("🧹 [DATABASE] Purging old job listings...");
-    const MONGO_URI = process.env.MONGO_URI;
+    //const MONGO_URI = process.env.MONGO_URI;
     
-    await mongoose.connect(MONGO_URI);
+    //await mongoose.connect(MONGO_URI);
     
     const result = await JobPosting.deleteMany({}); 
     
     console.log(`🗑️ [DATABASE] Successfully deleted ${result.deletedCount} closed jobs.`);
-    await mongoose.disconnect();
+    //await mongoose.disconnect();
     return result.deletedCount; 
 };
 
@@ -96,9 +96,9 @@ const runAllScrapers = async () => {
 
         let currentTotalJobs = 0;
         try {
-            await mongoose.connect(process.env.MONGO_URI);
+            //await mongoose.connect(process.env.MONGO_URI);
             currentTotalJobs = await JobPosting.countDocuments({});
-            await mongoose.disconnect();
+            //await mongoose.disconnect();
         } catch (err) {
             criticalError = `Could not verify database job count: ${err.message}`;
         }
