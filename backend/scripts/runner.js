@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 
 const scrapeGoogleJobs = require('./googleScraper');
 const scrapeAmazonJobs = require('./amazonScraper');
+const scrapeAtlassianJobs = require('./atlassianScraper');
 const scrapeAppleJobs = require('./appleScraper');
 const scrapeMicrosoftJobs = require('./microsoftScraper');
 const scrapeGreenhouseJobs = require('./greenhouseScraper');
@@ -50,14 +51,10 @@ const sendEmailReport = async (summaryHtml, isError = false) => {
 
 const clearDatabase = async () => {
     console.log("🧹 [DATABASE] Purging old job listings...");
-    //const MONGO_URI = process.env.MONGO_URI;
-    
-    //await mongoose.connect(MONGO_URI);
     
     const result = await JobPosting.deleteMany({}); 
     
     console.log(`🗑️ [DATABASE] Successfully deleted ${result.deletedCount} closed jobs.`);
-    //await mongoose.disconnect();
     return result.deletedCount; 
 };
 
@@ -91,22 +88,21 @@ const runAllScrapers = async () => {
         await executeScraper('Google', scrapeGoogleJobs);
         await executeScraper('Amazon', scrapeAmazonJobs);
 
-        // await executeScraper('Apple', scrapeAppleJobs);
+        await executeScraper('Apple', scrapeAppleJobs);
 
-        // await executeScraper('Microsoft', scrapeMicrosoftJobs);
+        await executeScraper('Microsoft', scrapeMicrosoftJobs);
 
         await executeScraper('GreenHouse', scrapeGreenhouseJobs);
         await executeScraper('Lever', scrapeLeverJobs);
         await executeScraper('Workday', scrapeWorkdayJobs);
+        await executeScraper('Atlassian', scrapeAtlassianJobs);
 
         const timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
         console.log(`✅ [MASTER RUNNER] All scrapes completed successfully in ${timeTaken} seconds.`);
 
         let currentTotalJobs = 0;
         try {
-            //await mongoose.connect(process.env.MONGO_URI);
             currentTotalJobs = await JobPosting.countDocuments({});
-            //await mongoose.disconnect();
         } catch (err) {
             criticalError = `Could not verify database job count: ${err.message}`;
         }
@@ -139,4 +135,4 @@ const runAllScrapers = async () => {
 };
 
 module.exports = runAllScrapers;
-//runAllScrapers();
+// runAllScrapers();
