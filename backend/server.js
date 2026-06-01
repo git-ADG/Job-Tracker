@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cron = require('node-cron');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 5000;
@@ -10,6 +11,8 @@ const applicationsRoutes = require('./routes/applications-routes');
 const jobRoutes = require('./routes/job-routes');
 const userRoutes = require('./routes/user-routes');
 const jobPostingRoutes = require('./routes/job-posting-routes');
+
+const runAllScrapers = require('./scripts/runner');
 
 dotenv.config();
 
@@ -34,6 +37,14 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.get('/', (req, res) => {
     res.json({status:'online', message: 'Welcome to the Job Tracker API' });
+});
+
+cron.schedule('0 8,20 * * *', () => {
+    console.log("⏰ [CRON] Triggering Bi-Daily Scrape Sequence (IST)...");
+    runAllScrapers();
+}, {
+    scheduled: true,
+    timezone: "Asia/Kolkata" 
 });
 
 app.listen(PORT, () => {
