@@ -1,6 +1,16 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const axios = require('axios');
+const https = require('https');
+const crypto = require('crypto');
+
+
+const cloudflareBypassAgent = new https.Agent({
+    ciphers: "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA256:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA",
+    honorCipherOrder: true,
+    secureOptions: crypto.constants.SSL_OP_NO_TLSv1 | crypto.constants.SSL_OP_NO_TLSv1_1
+});
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
@@ -9,41 +19,47 @@ const MONGO_URI = process.env.MONGO_URI;
 
 //not all working needs fixing
 const workdayCompanies = [
-    { 
-        name: 'Nvidia', 
-        host: 'nvidia.wd5.myworkdayjobs.com', 
-        tenant: 'nvidia', 
-        careerSite: 'NVIDIAExternalCareerSite' 
-    },
-    { 
-        name: 'Adobe', 
-        host: 'adobe.wd5.myworkdayjobs.com', 
-        tenant: 'adobe', 
-        careerSite: 'external_experienced' 
-    },
-    { 
-        name: 'Walmart', 
-        host: 'walmart.wd5.myworkdayjobs.com', 
-        tenant: 'walmart', 
-        careerSite: 'WalmartExternal' 
-    },
-    { 
-        name: 'Mastercard', 
-        host: 'mastercard.wd1.myworkdayjobs.com', 
-        tenant: 'mastercard', 
-        careerSite: 'CorporateCareers' 
-    },
-    { 
-        name: 'Morgan Stanley', 
-        host: 'ms.wd1.myworkdayjobs.com', 
-        tenant: 'ms', 
-        careerSite: 'External' 
+    {
+        name: "NVIDIA",
+        url: "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs",
+        payload: {
+            appliedFacets: { 
+                locationHierarchy1: ["2fcb99c455831013ea52b82135ba3266"] 
+            },
+            limit: 20,
+            offset: 0,
+            searchText: "Software Engineer" 
+        }
     },
     {
-        name: 'Goldman Sachs', 
-        host: 'goldmansachs.wd1.myworkdayjobs.com', 
-        tenant: 'goldmansachs', 
-        careerSite: 'Goldman_Sachs_Careers'
+        name: "Adobe",
+        url: "https://adobe.wd5.myworkdayjobs.com/wday/cxs/adobe/external_experienced/jobs",
+        payload: {
+            appliedFacets: {},
+            limit: 20,
+            offset: 0,
+            searchText: "Software Engineer India"
+        }
+    },
+    {
+        name: "Walmart",
+        url: "https://walmart.wd5.myworkdayjobs.com/wday/cxs/walmart/WalmartExternal/jobs",
+        payload: {
+            appliedFacets: {},
+            limit: 20,
+            offset: 0,
+            searchText: "Software Engineer India"
+        }
+    },
+    {
+        name: "Mastercard",
+        url: "https://mastercard.wd1.myworkdayjobs.com/wday/cxs/mastercard/CorporateCareers/jobs",
+        payload: {
+            appliedFacets: {},
+            limit: 20,
+            offset: 0,
+            searchText: "Software Engineer India"
+        }
     }
 ];
 
@@ -68,14 +84,20 @@ const scrapeWorkdayJobs = async () => {
                 searchText: "Software Engineer"
             };
 
-            const response = await fetch(apiUrl, {
+            const response = await fetch(company.url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    
+                    // The Disguise Headers
+                    'Origin': 'https://nvidia.wd5.myworkdayjobs.com',
+                    'Referer': 'https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(company.payload),
+                
+                agent: cloudflareBypassAgent
             });
 
             if (!response.ok) {
@@ -141,3 +163,4 @@ const scrapeWorkdayJobs = async () => {
 };
 
 module.exports = scrapeWorkdayJobs;
+// scrapeWorkdayJobs();

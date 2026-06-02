@@ -8,8 +8,7 @@ const JobPosting = require('../models/job-posting');
 //const MONGO_URI = process.env.MONGO_URI;
 
 //not all working need to check the paths
-const leverCompanies = ['razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'github'];
-
+const leverCompanies = ['stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'razorpaysoftwareprivatelimited', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion'];
 
 //clean json formatted data
 const scrapeLeverJobs = async () => {
