@@ -64,7 +64,8 @@ const scrapeMorganStanleyJobs = async () => {
                     rawJobString.includes('bangalore') || 
                     rawJobString.includes('mumbai') ||
                     rawJobString.includes('hyderabad') ||
-                    rawJobString.includes('remote - ind');
+                    rawJobString.includes('remote - ind')
+                    && !(rawJobString.includes('indiana'));
 
                 if (isEngineering && isIndia) {
                     const jobUrl = job.positionUrl 

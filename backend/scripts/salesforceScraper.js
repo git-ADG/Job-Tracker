@@ -47,8 +47,7 @@ const scrapeSalesforceJobs = async () => {
                 rawJobString.includes('india') || 
                 rawJobString.includes('bengaluru') || 
                 rawJobString.includes('bangalore') || 
-                rawJobString.includes('hyderabad') ||
-                rawJobString.includes('remote - ind');
+                rawJobString.includes('hyderabad') && !(rawJobString.includes('indiana'));
 
             if (isEngineering && isIndia) {
                 const jobUrl = job.External_Job_Posting_Site || job.url;
