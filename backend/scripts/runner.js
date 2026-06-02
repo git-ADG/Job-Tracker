@@ -101,12 +101,13 @@ const runAllScrapers = async () => {
         await executeScraper('Amazon', scrapeAmazonJobs);
 
         await executeScraper('Apple', scrapeAppleJobs);
-
         await executeScraper('Microsoft', scrapeMicrosoftJobs);
 
         await executeScraper('GreenHouse', scrapeGreenhouseJobs);
         await executeScraper('Lever', scrapeLeverJobs);
+
         await executeScraper('Workday', scrapeWorkdayJobs);
+        
         await executeScraper('Atlassian', scrapeAtlassianJobs);
         await executeScraper('GitHub', scrapeGithubJobs);
         await executeScraper('Goldman Sachs', scrapeGoldmanSachsJobs);
