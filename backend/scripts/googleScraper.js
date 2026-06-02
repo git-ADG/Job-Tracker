@@ -10,10 +10,18 @@ dotenv.config({path : path.join(__dirname, '../.env')});
 //const MONGO_URI = process.env.MONGO_URI;
 //console.log("Database URI targeting:", MONGO_URI);
 
+
+//heavy security, took time to locate the api
+//highly scraper resistant
+//raw unformatted data, headache to retrieve
+//needed recursion to find the array containing the required data
+//slow and time consuming scraper
 const scrapeGoogleJobs = async () => {
   console.log("Initiating stealth batchexecute request to Google...");
 
   try {
+    //needs formatting
+    //working for now
     const response = await axios.post(
       'https://www.google.com/about/careers/applications/_/HiringCportalFrontendUi/data/batchexecute',
       'f.req=%5B%5B%5B%22r06xKb%22%2C%22%5B%5B%5C%22software%20engineer%20india%5C%22%2Cnull%2Cnull%2Cnull%2C%5C%22en-US%5C%22%2Cnull%2Cnull%2C1%5D%5D%22%2Cnull%2C%223%22%5D%5D%5D&',
@@ -93,7 +101,6 @@ const scrapeGoogleJobs = async () => {
             }
         }
         
-        // Keep digging deeper
         for (const item of data) {
             extractJobs(item);
         }
@@ -131,7 +138,7 @@ const scrapeGoogleJobs = async () => {
         }
     }
 
-    console.log(`\n🎉 Success! Inserted ${addedCount} brand new jobs into your database.`);
+    console.log(`\n Success! Inserted ${addedCount} brand new jobs into your database.`);
 
   } catch (error) {
     console.error("Request Failed:", error.message);

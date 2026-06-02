@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+//schema for job fetched from rapidAPI
+//not in use in current prod, only used during dev phase
 const fetchedJobSchema = new mongoose.Schema({
     jobId: { type: String, required: true, unique: true },
     companyName : { type: String, required: true },

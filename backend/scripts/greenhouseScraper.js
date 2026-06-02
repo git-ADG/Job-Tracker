@@ -7,8 +7,10 @@ const JobPosting = require('../models/job-posting');
 
 //const MONGO_URI = process.env.MONGO_URI;
 
-const greenhouseCompanies = ['stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'atlassian', 'razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'github'];
+//not all working, need to check the paths
+const greenhouseCompanies = ['stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'github'];
 
+//clean json formatted response
 const scrapeGreenhouseJobs = async () => {
     console.log(`Initiating sweep across ${greenhouseCompanies.length} Greenhouse boards...`);
     //await mongoose.connect(MONGO_URI);
@@ -40,15 +42,16 @@ const scrapeGreenhouseJobs = async () => {
                 
                 const isEngineer = title.includes('engineer') || title.includes('developer');
                 
-                // THE FIX: Only pass if the location explicitly mentions India or a major tech hub.
-                // This handles "Remote - India", "Bengaluru", and "India" while blocking "Remote - US".
+                //rejecting huge chunks of remote jobs based in US
                 const isIndia = location.includes('india') || 
                                 location.includes('bengaluru') || 
                                 location.includes('bangalore') || 
                                 location.includes('hyderabad') || 
                                 location.includes('pune') ||
+                                location.includes('mumbai') ||
                                 location.includes('noida') ||
-                                location.includes('gurugram');
+                                location.includes('gurugram') ||
+                                location.includes('gurgaon');
                 
                 return isEngineer && isIndia;
             });
@@ -79,11 +82,11 @@ const scrapeGreenhouseJobs = async () => {
             console.log(`[+] Added ${addedCount} new jobs for ${company}.`);
 
         } catch (error) {
-            console.error(`❌ Failed to process ${company}:`, error.message);
+            console.error(` Failed to process ${company}:`, error.message);
         }
     }
 
-    console.log(`\n🎉 Greenhouse Sweep Complete! Inserted ${totalAdded} brand new jobs across all boards.`);
+    console.log(`\n Greenhouse Sweep Complete! Inserted ${totalAdded} brand new jobs across all boards.`);
     
 };
 

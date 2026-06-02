@@ -4,6 +4,7 @@ const Application = require('../models/application');
 
 const { protect } = require('../middleware/auth-middleware');
 
+//protected route
 router.use(protect);
 
 //CREATE
@@ -22,7 +23,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
     try{
         console.log("Backend received request for User ID:", req.user.id);
-        const applications = await Application.find({ user: req.user.id }).sort({ appliedDate: -1 });
+        const applications = await Application.find({ user: req.user.id }).sort({ appliedDate: -1 }); //newest first
         res.status(200).json(applications);
     }catch(err){
         res.status(500).json({ error: 'Failed to fetch applications', details: err.message });

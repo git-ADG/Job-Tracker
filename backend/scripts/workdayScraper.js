@@ -7,6 +7,7 @@ const JobPosting = require('../models/job-posting');
 
 const MONGO_URI = process.env.MONGO_URI;
 
+//not all working needs fixing
 const workdayCompanies = [
     { 
         name: 'Nvidia', 
@@ -54,7 +55,7 @@ const scrapeWorkdayJobs = async () => {
 
     for (const company of workdayCompanies) {
         try {
-            console.log(`\n🔍 Cracking ${company.name.toUpperCase()}...`);
+            console.log(`\n Cracking ${company.name.toUpperCase()}...`);
             
             
             const apiUrl = `https://${company.host}/wday/cxs/${company.tenant}/${company.careerSite}/jobs`;
@@ -96,7 +97,11 @@ const scrapeWorkdayJobs = async () => {
                                 location.includes('bengaluru') || 
                                 location.includes('bangalore') || 
                                 location.includes('hyderabad') || 
-                                location.includes('pune');
+                                location.includes('pune') ||
+                                location.includes('mumbai') ||
+                                location.includes('noida') ||
+                                location.includes('gurugram') ||
+                                location.includes('gurgaon');
                 
                 return isIndia;
             });
@@ -127,11 +132,11 @@ const scrapeWorkdayJobs = async () => {
             console.log(`[+] Added ${addedCount} new jobs for ${company.name}.`);
 
         } catch (error) {
-            console.error(`❌ Failed to process ${company.name}:`, error.message);
+            console.error(` Failed to process ${company.name}:`, error.message);
         }
     }
 
-    console.log(`\n🎉 Workday Sweep Complete! Inserted ${totalAdded} brand new jobs.`);
+    console.log(`\n Workday Sweep Complete! Inserted ${totalAdded} brand new jobs.`);
     
 };
 

@@ -7,8 +7,11 @@ const JobPosting = require('../models/job-posting');
 
 //const MONGO_URI = process.env.MONGO_URI;
 
-const leverCompanies = ['atlassian', 'razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'github'];
+//not all working need to check the paths
+const leverCompanies = ['razorpay', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion', 'stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'github'];
 
+
+//clean json formatted data
 const scrapeLeverJobs = async () => {
     console.log(`Initiating sweep across ${leverCompanies.length} Lever boards...`);
     //await mongoose.connect(MONGO_URI);
@@ -45,9 +48,11 @@ const scrapeLeverJobs = async () => {
                                 location.includes('bengaluru') || 
                                 location.includes('bangalore') || 
                                 location.includes('hyderabad') || 
+                                location.includes('mumbai') ||
                                 location.includes('pune') ||
                                 location.includes('noida') ||
-                                location.includes('gurugram');
+                                location.includes('gurugram') ||
+                                location.includes('gurgaon');
                 
                 return isEngineer && isIndia;
             });
@@ -61,7 +66,7 @@ const scrapeLeverJobs = async () => {
                 companyName: company.charAt(0).toUpperCase() + company.slice(1),
                 role: String(job.text),
                 location: String(job.categories?.location || 'India'),
-                applyLink: String(job.hostedUrl), // Lever uses hostedUrl for the apply link
+                applyLink: String(job.hostedUrl), 
                 salaryRaw: "N/A" 
             }));
 
@@ -78,11 +83,11 @@ const scrapeLeverJobs = async () => {
             console.log(`[+] Added ${addedCount} new jobs for ${company}.`);
 
         } catch (error) {
-            console.error(`❌ Failed to process ${company}:`, error.message);
+            console.error(`Failed to process ${company}:`, error.message);
         }
     }
 
-    console.log(`\n🎉 Lever Sweep Complete! Inserted ${totalAdded} brand new jobs across all boards.`);
+    console.log(`\nLever Sweep Complete! Inserted ${totalAdded} brand new jobs across all boards.`);
 };
 
 module.exports = scrapeLeverJobs;

@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 
+//user schema
+//email validation not implemented yet
+//hashed passwords stored
+//usernames not unique
 const UserSchema = mongoose.Schema({
     username : {type: String, required: true},
     email : {type: String, required: true},

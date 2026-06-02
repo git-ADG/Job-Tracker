@@ -12,7 +12,6 @@ const KanbanBoard = ({ applications, setApplications, handleDelete }) => {
         'Applied': [], 'OA': [], 'Interview': [], 'Offer': [], 'Rejected': [], 'Accepted': []
     });
 
-    // --- Modal State ---
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeApp, setActiveApp] = useState(null);
     const [noteText, setNoteText] = useState("");
@@ -54,10 +53,9 @@ const KanbanBoard = ({ applications, setApplications, handleDelete }) => {
         }
     };
 
-    // --- Note Handlers ---
     const openNoteModal = (app) => {
         setActiveApp(app);
-        setNoteText(app.notes || ""); // Load existing notes or empty string
+        setNoteText(app.notes || ""); 
         setIsModalOpen(true);
     };
 
@@ -71,14 +69,12 @@ const KanbanBoard = ({ applications, setApplications, handleDelete }) => {
         if (!activeApp) return;
 
         try {
-            // Optimistic UI update in the main applications array
             const updatedApplications = applications.map(app => 
                 app._id === activeApp._id ? { ...app, notes: noteText } : app
             );
             setApplications(updatedApplications);
             closeNoteModal();
 
-            // Send to backend
             await axios.put(`${API_URI}/api/applications/${activeApp._id}/notes`, {
                 notes: noteText
             }, {
@@ -148,7 +144,7 @@ const KanbanBoard = ({ applications, setApplications, handleDelete }) => {
                                                                     border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold'
                                                                 }}
                                                             >
-                                                                {app.notes ? '📝 Edit Note' : '➕ Add Note'}
+                                                                {app.notes ? 'Edit Note' : 'Add Note'}
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleDelete(app._id)}

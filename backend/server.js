@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const cron = require('node-cron');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+
+dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 const applicationsRoutes = require('./routes/applications-routes');
@@ -15,21 +17,23 @@ const jobPostingRoutes = require('./routes/job-posting-routes');
 const runAllScrapers = require('./scripts/runner');
 const {protect} = require('./middleware/auth-middleware');
 
-dotenv.config();
-
 app.use(cors(
     {
         origin : ['http://localhost:5173', 'https://jobtrackerfrontend-fe1a.onrender.com'],
         credentials: true
     }
 ));
+
 app.use(bodyParser.json());
+
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/job-posting', jobPostingRoutes);
 
-mongoose.connect(process.env.MONGO_URI)
+
+const MONGO_URI = process.env.MONGO_URI;
+mongoose.connect(MONGO_URI)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => {
     console.error('Error connecting to MongoDB:', err);
@@ -40,9 +44,10 @@ app.get('/', (req, res) => {
     res.json({status:'online', message: 'Welcome to the Job Tracker API' });
 });
 
+//admin god mode controls
 app.post('/api/admin/force-scrape', protect , async (req, res) => {
     try {
-        console.log(`⚠️ [ADMIN] Manual scrape triggered by user: ${req.user.id}`);
+        console.log(`[ADMIN] Manual scrape triggered by user: ${req.user.id}`);
 
         runAllScrapers(); 
 
@@ -58,7 +63,7 @@ app.post('/api/admin/force-scrape', protect , async (req, res) => {
 });
 
 cron.schedule('0 8,20 * * *', () => {
-    console.log("⏰ [CRON] Triggering Bi-Daily Scrape Sequence (IST)...");
+    console.log("[CRON] Triggering Bi-Daily Scrape Sequence...");
     runAllScrapers();
 }, {
     scheduled: true,

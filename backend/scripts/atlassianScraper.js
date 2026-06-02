@@ -1,6 +1,8 @@
 const axios = require('axios');
 const JobPosting = require('../models/job-posting');
 
+//medium security, took time to locate the api
+//perfectly formatted json response
 const scrapeAtlassianJobs = async () => {
     try {
         const response = await axios.get('https://www.atlassian.com/endpoint/careers/listings', {
@@ -63,7 +65,7 @@ const scrapeAtlassianJobs = async () => {
         }
 
     } catch (error) {
-        console.error("❌ Atlassian Scraper Error:", error.message);
+        console.error("Atlassian Scraper Error:", error.message);
     }
 };
 
