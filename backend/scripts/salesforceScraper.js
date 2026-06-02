@@ -17,13 +17,17 @@ const scrapeSalesforceJobs = async () => {
             }
         });
 
+        console.log(response.data);
+
+
+
         const jobs = response.data.Report_Entry || [];
         let jobsAdded = 0;
 
         console.log(`Downloaded ${jobs.length} total global jobs from Salesforce CDN... filtering...`);
 
         for (const job of jobs) {
-            const title = (job.Title || job.Job_Title || job.title || '').toLowerCase();
+            const title = (job.Title || job.Job_Title || job.title || job.Job_Posting_Title || '').toLowerCase();
             const rawJobString = JSON.stringify(job).toLowerCase();
 
             const isEngineering = 
@@ -56,8 +60,8 @@ const scrapeSalesforceJobs = async () => {
                 if (!exists) {
                     await JobPosting.create({
                         companyName: 'Salesforce',
-                        role: job.Title || job.Job_Title || job.title || 'Software Engineer',
-                        location: job.Location || 'India (Multiple)',
+                        role:  job.Job_Posting_Title || 'Software Engineer',
+                        location: job.Job_Requisition_Primary_Location || 'India (Multiple)',
                         salary: 'Competitive', 
                         applyLink: jobUrl,
                         postedDate: job.External_Job_Posting_Start_Date ? new Date(job.External_Job_Posting_Start_Date) : new Date()
@@ -79,5 +83,4 @@ const scrapeSalesforceJobs = async () => {
 };
 
 // scrapeSalesforceJobs();
-
 module.exports = scrapeSalesforceJobs;
