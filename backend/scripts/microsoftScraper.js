@@ -7,13 +7,14 @@ const JobPosting = require('../models/job-posting');
 
 const MONGO_URI = process.env.MONGO_URI;
 
+//heavy security
+//not working, needs fixing
 const scrapeMicrosoftJobs = async () => {
     console.log("Initiating native fetch request to Microsoft Careers API...");
 
     try {
         const apiUrl = 'https://gcsservices.careers.microsoft.com/search/api/v1/search?q=Software%20Engineer&lc=India&pg=1&pgSz=50&o=Recent';
         
-        // Using native Node fetch instead of Axios
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
@@ -27,7 +28,6 @@ const scrapeMicrosoftJobs = async () => {
 
         const data = await response.json();
 
-        // Safe extraction from Microsoft's response matrix
         const jobsData = data?.operationResult?.result?.jobs;
 
         if (!jobsData || jobsData.length === 0) {
@@ -58,10 +58,10 @@ const scrapeMicrosoftJobs = async () => {
             }
         }
 
-        console.log(`🎉 Success! Inserted ${addedCount} brand new Microsoft jobs into your database.`);
+        console.log(`Success! Inserted ${addedCount} brand new Microsoft jobs into your database.`);
 
     } catch (error) {
-        console.error("❌ Microsoft Request Failed:", error.message);
+        console.error("Microsoft Request Failed:", error.message);
     }
 };
 

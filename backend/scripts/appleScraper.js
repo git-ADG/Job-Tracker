@@ -8,6 +8,8 @@ const JobPosting = require('../models/job-posting');
 
 //const MONGO_URI = process.env.MONGO_URI;
 
+//heavy security
+//currently not working
 const scrapeAppleJobs = async () => {
     console.log("Initiating POST request to Apple Jobs API...");
 
@@ -65,10 +67,10 @@ const scrapeAppleJobs = async () => {
             }
         }
 
-        console.log(`🎉 Success! Inserted ${addedCount} brand new Apple jobs into your database.`);
+        console.log(`Success! Inserted ${addedCount} brand new Apple jobs into your database.`);
 
     } catch (error) {
-        console.error("❌ Apple Request Failed:", error.message);
+        console.error("Apple Request Failed:", error.message);
     }
 };
 

@@ -8,6 +8,8 @@ const JobPosting = require('../models/job-posting');
 
 //const MONGO_URI = process.env.MONGO_URI;
 
+//response is in perfect json format
+//no security headaches, easy access
 const scrapeAmazonJobs = async () => {
     console.log("Initiating API request to Amazon Jobs...");
 
@@ -64,10 +66,10 @@ const scrapeAmazonJobs = async () => {
             }
         }
 
-        console.log(`🎉 Success! Inserted ${addedCount} brand new Amazon jobs into your database.`);
+        console.log(`Success! Inserted ${addedCount} brand new Amazon jobs into your database.`);
 
     } catch (error) {
-        console.error("❌ Amazon Request Failed:", error.message);
+        console.error("Amazon Request Failed:", error.message);
     }
 };
 

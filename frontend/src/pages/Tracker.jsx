@@ -76,14 +76,13 @@ const Tracker = () => {
 
     const handleForceScrape = async () => {
         const isConfirmed = window.confirm(
-            "⚠️ COMMAND OVERRIDE: This will instantly purge all closed jobs and trigger a global FAANG scrape. It takes roughly 30 seconds. Proceed?"
+            "COMMAND OVERRIDE: This will instantly purge all closed jobs and trigger a global scrape. It takes roughly 30 seconds. Proceed?"
         );
         
         if (!isConfirmed) return;
 
         try {
-            // We alert first so the UI feels responsive
-            alert("🚀 Scrape initiated! You will receive an email report once the pipeline finishes.");
+            alert("Scrape initiated! You will receive an email report once the pipeline finishes.");
             
             await axios.post(`${API_URI}/api/admin/force-scrape`, {} , {
                 headers: {
@@ -122,17 +121,15 @@ const Tracker = () => {
                     onClick={handleForceScrape}
                     style={{ 
                         padding: '10px 20px', 
-                        backgroundColor: '#1a1a1a', 
-                        color: '#00ffcc', 
-                        border: '1px solid #00ffcc', 
+                        backgroundColor: 'transparent', 
+                        color: 'white',
+                        border : 'none',
                         borderRadius: '6px', 
                         cursor: 'pointer', 
                         fontWeight: 'bold',
                         fontFamily: 'monospace',
-                        boxShadow: '0 0 10px rgba(0, 255, 204, 0.2)'
+                        boxShadow: 'none'
                     }}
-                    onMouseOver={(e) => e.target.style.backgroundColor = '#333'}
-                    onMouseOut={(e) => e.target.style.backgroundColor = '#1a1a1a'}
                 >
                     FORCE SCRAPE
                 </button>

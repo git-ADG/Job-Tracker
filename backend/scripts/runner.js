@@ -16,6 +16,7 @@ const scrapeWorkdayJobs = require('./workdayScraper');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
+//email ocassionally throwing timeout, needs fixing
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,           
@@ -33,33 +34,38 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmailReport = async (summaryHtml, isError = false) => {
-    const statusEmoji = isError ? '❌' : '✅';
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: process.env.RECEIVER_EMAIL,
-        subject: `${statusEmoji} Job Tracker Scraper Report - ${new Date().toLocaleDateString('en-IN')}`,
+        subject: `Job Tracker Scraper Report - ${new Date().toLocaleDateString('en-IN')}`,
         html: summaryHtml
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("📨 [EMAIL] Status report sent successfully.");
+        console.log("[EMAIL] Status report sent successfully.");
     } catch (err) {
-        console.error("❌ [EMAIL] Failed to send email:", err.message);
+        console.error("[EMAIL] Failed to send email:", err.message);
     }
 };
 
+//database cleared and jobs fetched fresh
+//done for 2 reasons
+//avoid duplicates
+//remove closed job openings
 const clearDatabase = async () => {
-    console.log("🧹 [DATABASE] Purging old job listings...");
+    console.log("[DATABASE] Purging old job listings...");
     
     const result = await JobPosting.deleteMany({}); 
     
-    console.log(`🗑️ [DATABASE] Successfully deleted ${result.deletedCount} closed jobs.`);
+    console.log(`[DATABASE] Successfully deleted ${result.deletedCount} closed jobs.`);
     return result.deletedCount; 
 };
 
+//master runner
+//runs all scripts whenever called by the node cron job
 const runAllScrapers = async () => {
-    console.log("🚀 [MASTER RUNNER] Initiating FAANG Scrape Sequence...");
+    console.log("[MASTER RUNNER] Initiating FAANG Scrape Sequence...");
     const startTime = Date.now();
     let reportLogs = [];
     let criticalError = null;
@@ -68,10 +74,10 @@ const runAllScrapers = async () => {
         try {
             console.log(`--- Starting ${name} ---`);
             await scraperFunc();
-            reportLogs.push(`<li>✅ <b>${name}:</b> Completed successfully.</li>`);
+            reportLogs.push(`<li><b>${name}:</b> Completed successfully.</li>`);
         } catch (err) {
             console.error(`❌ ${name} Failed:`, err.message);
-            reportLogs.push(`<li>❌ <b>${name} Failed:</b> <span style="color:red;">${err.message}</span></li>`);
+            reportLogs.push(`<li><b>${name} Failed:</b> <span style="color:red;">${err.message}</span></li>`);
         }
     };
 
@@ -80,9 +86,9 @@ const runAllScrapers = async () => {
         let deletedCount = 0;
         try {
             deletedCount = await clearDatabase();
-            reportLogs.push(`<li>🧹 <b>Database Purge:</b> Removed ${deletedCount} older jobs.</li>`);
+            reportLogs.push(`<li> <b>Database Purge:</b> Removed ${deletedCount} older jobs.</li>`);
         } catch (err) {
-            reportLogs.push(`<li>❌ <b>Database Purge Failed:</b> ${err.message}</li>`);
+            reportLogs.push(`<li> <b>Database Purge Failed:</b> ${err.message}</li>`);
         }
 
         await executeScraper('Google', scrapeGoogleJobs);
@@ -98,7 +104,7 @@ const runAllScrapers = async () => {
         await executeScraper('Atlassian', scrapeAtlassianJobs);
 
         const timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
-        console.log(`✅ [MASTER RUNNER] All scrapes completed successfully in ${timeTaken} seconds.`);
+        console.log(`[MASTER RUNNER] All scrapes completed successfully in ${timeTaken} seconds.`);
 
         let currentTotalJobs = 0;
         try {
@@ -130,7 +136,7 @@ const runAllScrapers = async () => {
         await sendEmailReport(emailHtml, reportLogs.some(log => log.includes('Failed')));
 
     } catch (error) {
-        console.error("❌ [MASTER RUNNER] Sequence failed:", error);
+        console.error("[MASTER RUNNER] Sequence failed:", error);
     }
 };
 

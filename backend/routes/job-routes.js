@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
+//not in use in current prod
+//only used during dev phase
 router.get('/search', async (req, res) => {
     const {query, page} = req.query;
     try{

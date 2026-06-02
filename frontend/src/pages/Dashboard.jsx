@@ -102,7 +102,7 @@ const Dashboard = () => {
                                     href={job.applyLink} target="_blank" rel="noreferrer"
                                     style={{display : 'inline-block', padding : '8px 15px', backgroundColor : '#007bff', color: "#fff", textDecoration : 'none', borderRadius: '4px', fontWeight: 'bold'}}
                                 >
-                                    Apply via Portal ↗
+                                    Apply via Portal
                                 </a>
 
                                 <button 

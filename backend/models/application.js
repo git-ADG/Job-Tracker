@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+//schema for application tracker
 const ApplicationSchema = new mongoose.Schema({
     user : {
         type: mongoose.Schema.Types.ObjectId,
