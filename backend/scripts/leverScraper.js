@@ -62,7 +62,7 @@ const scrapeLeverJobs = async () => {
             }
 
             const formattedJobs = techJobs.map(job => ({
-                companyName: company.charAt(0).toUpperCase() + company.slice(1),
+                companyName: (company == 'razorpaysoftwareprivatelimited') ? 'Razorpay' :  company.charAt(0).toUpperCase() + company.slice(1),
                 role: String(job.text),
                 location: String(job.categories?.location || 'India'),
                 applyLink: String(job.hostedUrl), 

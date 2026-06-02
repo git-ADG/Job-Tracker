@@ -62,7 +62,7 @@ const scrapeGreenhouseJobs = async () => {
             }
 
             const formattedJobs = techJobs.map(job => ({
-                companyName: company.charAt(0).toUpperCase() + company.slice(1),
+                companyName: (company == 'razorpaysoftwareprivatelimited') ? 'Razorpay' : company.charAt(0).toUpperCase() + company.slice(1),
                 role: String(job.title),
                 location: String(job.location.name),
                 applyLink: String(job.absolute_url),
