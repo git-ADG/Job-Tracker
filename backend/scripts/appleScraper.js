@@ -1,77 +1,134 @@
-const axios = require('axios');
-//const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const path = require('path');
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
 
-//const MONGO_URI = process.env.MONGO_URI;
-
-//heavy security
-//currently not working
 const scrapeAppleJobs = async () => {
-    console.log("Initiating POST request to Apple Jobs API...");
-
     try {
-        const apiUrl = 'https://jobs.apple.com/api/role/search';
+        let page = 1;
+        let hasMore = true;
+        let jobsAdded = 0;
+        let totalJobsFound = 0;
 
-        const searchPayload = {
-            query: "Software Engineer",
-            filters: {
-                locations: {
-                    location: ["IND"]
-                }
-            },
-            page: 1,
-            sort: "newest"
-        };
+        console.log("Initiating Apple CSRF-Stealth Scraper...");
 
-        const response = await axios.post(apiUrl, searchPayload, {
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36',
-                'Referer': 'https://jobs.apple.com/en-in/search?search=Software%20Engineer&sort=newest&location=india-IND'
-            }
-        });
-
-        const jobsData = response.data.searchResults;
-
-        if (!jobsData || jobsData.length === 0) {
-            console.log("[-] No jobs found or Apple blocked the request.");
-            return;
-        }
-
-        const formattedJobs = jobsData.map(job => {
-            const locationName = job.locations && job.locations[0] ? job.locations[0].name : "India";
+        while (hasMore) {
+            const url = 'https://jobs.apple.com/api/v1/search/page';
             
-            return {
-                companyName: "Apple",
-                role: String(job.postingTitle || "Unknown Role"),
-                location: String(locationName),
-                applyLink: `https://jobs.apple.com/en-in/details/${job.positionId}`,
-                salaryRaw: "N/A" 
+            const payload = {
+                query: "software engineer",
+                filters: {
+                    location: ["india-INDC"],
+                    team: [
+                        "apps-and-frameworks-SFTWR-AF",
+                        "cloud-and-infrastructure-SFTWR-CLD",
+                        "core-operating-systems-SFTWR-COS",
+                        "devops-and-site-reliability-SFTWR-DSR",
+                        "engineering-project-management-SFTWR-EPM",
+                        "information-systems-and-technology-SFTWR-ISTECH",
+                        "machine-learning-SFTWR-MCHLN",
+                        "security-and-privacy-SFTWR-SEC",
+                        "software-quality-automation-tools-SFTWR-SQAT",
+                        "wireless-software-SFTWR-WSFT"
+                    ]
+                },
+                page: page,
+                sort: "relevance"
             };
-        });
 
-        console.log(`[+] Found ${formattedJobs.length} pristine Apple jobs. Connecting to Database...`);
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://jobs.apple.com',
+                    'Referer': 'https://jobs.apple.com/en-in/search?sort=relevance&location=india-INDC',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                body: JSON.stringify(payload)
+            });
 
-        //await mongoose.connect(MONGO_URI);
-        
-        let addedCount = 0;
-        for (const job of formattedJobs) {
-            const existingJob = await JobPosting.findOne({ applyLink: job.applyLink });
-            if (!existingJob) {
-                await JobPosting.create(job);
-                addedCount++;
+            if (!response.ok) {
+                console.error(`Apple API rejected request with status: ${response.status}`);
+                break;
+            }
+
+            const jsonResponse = await response.json();
+            console.log(jsonResponse.searchResults);
+            const jobs = jsonResponse.searchResults || jsonResponse.positions || [];
+
+            if (jobs.length === 0) {
+                hasMore = false;
+                break;
+            }
+
+            totalJobsFound += jobs.length;
+
+            for (const job of jobs) {
+                const title = (job.postingTitle || job.title || job.name || '').toLowerCase();
+                const rawJobString = JSON.stringify(job).toLowerCase();
+
+                const isEngineering = 
+                    title.includes('software') || 
+                    title.includes('engineer') || 
+                    title.includes('developer') || 
+                    title.includes('sde') || 
+                    title.includes('mts') || 
+                    title.includes('architect') ||
+                    title.includes('data') ||
+                    rawJobString.includes('engineering');
+
+                const isIndia = 
+                    rawJobString.includes('india') || 
+                    rawJobString.includes('bengaluru') || 
+                    rawJobString.includes('bangalore') || 
+                    rawJobString.includes('hyderabad');
+
+                if (isEngineering && isIndia) {
+                    const jobId = job.id || job.jobId || job.positionId;
+                    if (!jobId) continue;
+
+                    const jobUrl = `https://jobs.apple.com/en-in/details/${jobId}`;
+                    const exists = await JobPosting.findOne({ portalLink: jobUrl });
+
+                    if (!exists) {
+                        let locStr = 'India';
+                        if (Array.isArray(job.locations) && job.locations[0]) {
+                            locStr = `${job.locations[0].city || 'India'}, ${job.locations[0].countryName || ''}`;
+                        } else if (job.location) {
+                            locStr = job.location;
+                        }
+
+                        await JobPosting.create({
+                            companyName: 'Apple',
+                            role: job.postingTitle || job.title || 'Software Engineer',
+                            location: locStr,
+                            salary: 'Competitive',
+                            applyLink: jobUrl,
+                            postedDate: job.jobArrivalDate ? new Date(job.jobArrivalDate) : new Date()
+                        });
+                        jobsAdded++;
+                    }
+                }
+            }
+
+            const totalRecords = jsonResponse.totalRecords || 0;
+            if (totalJobsFound >= totalRecords || jobs.length === 0) {
+                hasMore = false;
+            } else {
+                page++;
             }
         }
 
-        console.log(`Success! Inserted ${addedCount} brand new Apple jobs into your database.`);
+        console.log(`[+] Scanned ${totalJobsFound} total postings across Apple.`);
+        if (jobsAdded > 0) {
+            console.log(`[+] Added ${jobsAdded} new India Engineering jobs for Apple.`);
+        } else {
+            console.log(`[-] No new India Engineering jobs found for Apple right now.`);
+        }
 
     } catch (error) {
-        console.error("Apple Request Failed:", error.message);
+        console.error("Apple Scraper Error:", error.message);
     }
 };
 
 module.exports = scrapeAppleJobs;
+// scrapeAppleJobs();
