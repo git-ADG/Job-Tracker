@@ -17,7 +17,7 @@ const scrapeSalesforceJobs = async () => {
             }
         });
 
-        console.log(response.data);
+        //console.log(response.data);
 
 
 
@@ -30,6 +30,7 @@ const scrapeSalesforceJobs = async () => {
             const title = (job.Title || job.Job_Title || job.title || job.Job_Posting_Title || '').toLowerCase();
             const rawJobString = JSON.stringify(job).toLowerCase();
 
+            const location = job.Job_Requisition_Primary_Location;
             const isEngineering = 
                 title.includes('software') || 
                 title.includes('engineer') || 
@@ -44,10 +45,10 @@ const scrapeSalesforceJobs = async () => {
                 rawJobString.includes('r&d');
             
             const isIndia = 
-                rawJobString.includes('india') || 
-                rawJobString.includes('bengaluru') || 
-                rawJobString.includes('bangalore') || 
-                rawJobString.includes('hyderabad') && !(rawJobString.includes('indiana'));
+                location.includes('india') || 
+                location.includes('bengaluru') || 
+                location.includes('bangalore') || 
+                location.includes('hyderabad') && !(location.includes('indiana'));
 
             if (isEngineering && isIndia) {
                 const jobUrl = job.External_Job_Posting_Site || job.url;
