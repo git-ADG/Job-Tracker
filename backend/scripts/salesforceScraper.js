@@ -2,6 +2,7 @@ const axios = require('axios');
 const JobPosting = require('../models/job-posting');
 
 //structured but highly nested data
+//location causing problems
 const scrapeSalesforceJobs = async () => {
     try {
         console.log('Initiating Salesforce CDN Sweep...');
@@ -30,7 +31,8 @@ const scrapeSalesforceJobs = async () => {
             const title = (job.Title || job.Job_Title || job.title || job.Job_Posting_Title || '').toLowerCase();
             const rawJobString = JSON.stringify(job).toLowerCase();
 
-            const location = job.Job_Requisition_Primary_Location;
+            const location = job.Job_Requisition_Primary_Location.toLowerCase();
+            // console.log(location);
             const isEngineering = 
                 title.includes('software') || 
                 title.includes('engineer') || 
