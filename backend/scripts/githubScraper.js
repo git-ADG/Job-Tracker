@@ -13,13 +13,15 @@ const scrapeGithubJobs = async () => {
         });
 
         const jobs = Array.isArray(response.data) ? response.data : (response.data.jobs || response.data.data || []);
+        // console.log(jobs);
         let jobsAdded = 0;
 
         console.log(`[+] Found ${jobs.length} total pre-filtered jobs for GitHub... verifying...`);
 
         for (const job of jobs) {
             const title = (job.title || '').toLowerCase();
-            const rawLocation = JSON.stringify(job.location || job.locations || job.city || job.country || '').toLowerCase();
+            const rawLocation = JSON.stringify(job.full_location || job.location || job.locations || job.city || job.country || '').toLowerCase();
+            // console.log(rawLocation);
             const rawDepartment = JSON.stringify(job.team || job.department || job.category || '').toLowerCase();
 
             const isEngineering = 
