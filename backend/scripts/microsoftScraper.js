@@ -71,7 +71,15 @@ const scrapeMicrosoftJobs = async () => {
                     rawJobString.includes('pune') || 
                     rawJobString.includes('noida');
 
-                if (isEngineering && isIndia) {
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
+                if (isEngineering && isIndia && !isTooSenior) {
                     const jobUrl = job.positionUrl 
                         ? `https://apply.careers.microsoft.com${job.positionUrl}` 
                         : `https://apply.careers.microsoft.com/careers?pid=${job.id}`;
@@ -89,6 +97,7 @@ const scrapeMicrosoftJobs = async () => {
                         });
                         jobsAdded++;
                     }
+                    // jobsAdded++;
                 }
             }
 

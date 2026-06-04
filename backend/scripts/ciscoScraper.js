@@ -105,8 +105,16 @@ const scrapeCiscoJobs = async () => {
                     rawJobString.includes('bangalore') || 
                     rawJobString.includes('hyderabad') ||
                     rawJobString.includes('pune');
+                
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
 
-                if (isEngineering && isIndia) {
+                if (isEngineering && isIndia && !isTooSenior) {
                     const jobId = job.jobId || job.id;
                     if (!jobId) continue;
 

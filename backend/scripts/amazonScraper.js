@@ -58,7 +58,6 @@ const scrapeAmazonJobs = async () => {
         
         let addedCount = 0;
         for (const job of formattedJobs) {
-            // Prevent duplicates using your unique applyLink
             const existingJob = await JobPosting.findOne({ applyLink: job.applyLink });
             if (!existingJob) {
                 await JobPosting.create(job);

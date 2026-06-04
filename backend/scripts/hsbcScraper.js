@@ -57,7 +57,15 @@ const scrapeHsbcJobs = async () => {
                     rawJobString.includes('chennai')) &&
                     !(rawJobString.includes('indiana'));
 
-                if (isEngineering && isIndia) {
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
+                if (isEngineering && isIndia && !isTooSenior) {
                     const jobUrl = job.canonicalPositionUrl || `https://portal.careers.hsbc.com/careers/job/${job.id}`;
                     
                     if (processedLinks.has(jobUrl)) {

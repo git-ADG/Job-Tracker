@@ -52,7 +52,15 @@ const scrapeSalesforceJobs = async () => {
                 location.includes('bangalore') || 
                 location.includes('hyderabad') && !(location.includes('indiana'));
 
-            if (isEngineering && isIndia) {
+            const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
+            if (isEngineering && isIndia && !isTooSenior) {
                 const jobUrl = job.External_Job_Posting_Site || job.url;
                 
                 if (!jobUrl) continue; 

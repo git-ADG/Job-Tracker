@@ -69,7 +69,15 @@ const scrapeMorganStanleyJobs = async () => {
                     rawJobString.includes('remote - ind'))
                     && !(rawJobString.includes('indiana'));
 
-                if (isEngineering && isIndia) {
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
+                if (isEngineering && isIndia && !isTooSenior) {
                     const jobUrl = job.positionUrl 
                         ? `https://morganstanley.eightfold.ai${job.positionUrl}` 
                         : `https://morganstanley.eightfold.ai/careers?pid=${job.id}`;
