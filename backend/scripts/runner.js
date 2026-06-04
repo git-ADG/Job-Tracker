@@ -19,6 +19,7 @@ const scrapeMorganStanleyJobs = require('./morganStanleyScraper');
 const scrapeIntuitJobs = require('./intuitScraper');
 const scrapeUberJobs = require('./uberScraper');
 const scrapeCiscoJobs = require('./ciscoScraper');
+const scrapeHsbcJobs = require('./hsbcScraper');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
@@ -118,6 +119,8 @@ const runAllScrapers = async () => {
         await executeScraper('Uber', scrapeUberJobs);
 
         await executeScraper('Cisco', scrapeCiscoJobs);
+
+        await executeScraper('HSBC', scrapeHsbcJobs);
 
         const timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
         console.log(`[MASTER RUNNER] All scrapes completed successfully in ${timeTaken} seconds.`);
