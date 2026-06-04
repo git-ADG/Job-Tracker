@@ -70,6 +70,7 @@ const scrapeSalesforceJobs = async () => {
                     });
                     jobsAdded++;
                 }
+                // jobsAdded++;
             }
         }
         
