@@ -20,6 +20,25 @@ const MONGO_URI = process.env.MONGO_URI;
 //not all working needs fixing
 const workdayCompanies = [
     {
+        name: "BNY Mellon",
+        url: "https://bnymellon.wd1.myworkdayjobs.com/wday/cxs/bnymellon/careers/jobs", // <-- Update this with the exact Network Tab URL
+        payload: {
+            limit: 20,
+            offset: 0,
+            searchText: "Software Engineer India" 
+        }
+    },
+    {
+        name: "BlackRock",
+        url: "https://blackrock.wd1.myworkdayjobs.com/wday/cxs/blackrock/BlackRock_Professional/jobs",
+        payload: {
+            appliedFacets: {},
+            limit: 20,
+            offset: 0,
+            searchText: "Engineer India"
+        }
+    },
+    {
         name: "NVIDIA",
         url: "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs",
         payload: {
@@ -90,7 +109,6 @@ const scrapeWorkdayJobs = async () => {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     
-                    // The Disguise Headers
                     'Origin': 'https://nvidia.wd5.myworkdayjobs.com',
                     'Referer': 'https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
@@ -149,6 +167,8 @@ const scrapeWorkdayJobs = async () => {
                     addedCount++;
                     totalAdded++;
                 }
+                // addedCount++;
+                // totalAdded++;
             }
 
             console.log(`[+] Added ${addedCount} new jobs for ${company.name}.`);
