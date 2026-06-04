@@ -40,7 +40,15 @@ const scrapeAtlassianJobs = async () => {
                 rawLocation.includes('bangalore') || 
                 rawLocation.includes('remote - ind');
 
-            if (isEngineering && isIndia) {
+            const isTooSenior = 
+                title.includes('manager') || 
+                title.includes('director') || 
+                title.includes('vp') || 
+                title.includes('vice president') || 
+                title.includes('principal') ||
+                title.includes('head');
+
+            if (isEngineering && isIndia && !isTooSenior) {
                 const jobUrl = job.applyUrl || `https://www.atlassian.com/company/careers/detail/${job.id}`;
                 const exists = await JobPosting.findOne({ portalLink: jobUrl });
                 

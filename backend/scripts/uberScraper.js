@@ -80,9 +80,17 @@ const scrapeUberJobs = async () => {
                     title.includes('sde') || 
                     title.includes('data');
 
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
                 const isIndia = locationStr.includes('ind') || locationStr.includes('bangalore') || locationStr.includes('hyderabad');
 
-                if (isEngineering && isIndia) {
+                if (isEngineering && isIndia && !isTooSenior) {
                     const jobUrl = `https://www.uber.com/global/en/careers/list/${job.id}`;
                     
                     const exists = await JobPosting.findOne({ portalLink: jobUrl });

@@ -41,6 +41,14 @@ const scrapeGreenhouseJobs = async () => {
                 const location = job.location?.name?.toLowerCase() || '';
                 
                 const isEngineer = title.includes('engineer') || title.includes('developer');
+
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
                 
                 //rejecting huge chunks of remote jobs based in US
                 const isIndia = location.includes('india') || 
@@ -53,7 +61,7 @@ const scrapeGreenhouseJobs = async () => {
                                 location.includes('gurugram') ||
                                 location.includes('gurgaon');
                 
-                return isEngineer && isIndia;
+                return isEngineer && isIndia && !isTooSenior;
             });
 
             if (techJobs.length === 0) {

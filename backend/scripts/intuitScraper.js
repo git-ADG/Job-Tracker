@@ -88,7 +88,15 @@ const scrapeIntuitJobs = async () => {
                     locationLower.includes('bangalore') || 
                     locationLower.includes('hyderabad');
 
-                if (isEngineering && isIndia) {
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
+                if (isEngineering && isIndia && !isTooSenior) {
                     const exists = await JobPosting.findOne({ portalLink: jobUrl });
 
                     if (!exists) {

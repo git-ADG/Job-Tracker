@@ -1,7 +1,7 @@
 const axios = require('axios');
 const JobPosting = require('../models/job-posting');
 
-const scrapeMorganStanleyJobs = async () => {
+const scrapeHsbcJobs = async () => {
     try {
         let start = 0;
         let hasMore = true;
@@ -10,31 +10,21 @@ const scrapeMorganStanleyJobs = async () => {
         
         const processedLinks = new Set();
 
-        const initResponse = await axios.get('https://morganstanley.eightfold.ai/careers', {
-            headers: {
-                'accept': 'text/html,application/xhtml+xml',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
-        });
-
-        const csrfMatch = initResponse.data.match(/csrf-token"\s+content="([^"]+)"/) || initResponse.data.match(/"csrfToken"\s*:\s*"([^"]+)"/);
-        const csrfToken = csrfMatch ? csrfMatch[1] : '';
-        const sessionCookie = initResponse.headers['set-cookie'] ? initResponse.headers['set-cookie'].map(c => c.split(';')[0]).join('; ') : '';
+        console.log("Initiating HSBC Eightfold Targeted Scraper...");
 
         while (hasMore) {
-            const url = `https://morganstanley.eightfold.ai/api/pcsx/search?domain=morganstanley.com&start=${start}&sort_by=timestamp&filter_businessarea=technology`;
+            const url = `https://portal.careers.hsbc.com/api/apply/v2/jobs?domain=hsbc.com&query=Software%20Engineering&location=India&start=${start}&num=50`;
 
             const response = await axios.get(url, {
                 headers: {
                     'accept': 'application/json',
-                    'x-csrf-token': csrfToken,
-                    'cookie': sessionCookie,
-                    'referer': 'https://morganstanley.eightfold.ai/careers',
+                    'content-type': 'application/json',
+                    'referer': 'https://portal.careers.hsbc.com/careers?domain=hsbc.com',
                     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                 }
             });
 
-            const jobs = response.data.data?.positions || [];
+            const jobs = response.data.positions || [];
 
             if (jobs.length === 0) {
                 hasMore = false;
@@ -52,13 +42,10 @@ const scrapeMorganStanleyJobs = async () => {
                     title.includes('engineer') || 
                     title.includes('developer') || 
                     title.includes('sde') || 
-                    title.includes('mts') || 
-                    title.includes('technical staff') ||
                     title.includes('architect') ||
                     title.includes('data') ||
                     rawJobString.includes('engineering') ||
-                    rawJobString.includes('technology') ||
-                    rawJobString.includes('r&d');
+                    rawJobString.includes('technology');
                 
                 const isIndia = 
                     (rawJobString.includes('india') || 
@@ -66,8 +53,9 @@ const scrapeMorganStanleyJobs = async () => {
                     rawJobString.includes('bangalore') || 
                     rawJobString.includes('mumbai') ||
                     rawJobString.includes('hyderabad') ||
-                    rawJobString.includes('remote - ind'))
-                    && !(rawJobString.includes('indiana'));
+                    rawJobString.includes('pune') ||
+                    rawJobString.includes('chennai')) &&
+                    !(rawJobString.includes('indiana'));
 
                 const isTooSenior = 
                     title.includes('manager') || 
@@ -78,26 +66,24 @@ const scrapeMorganStanleyJobs = async () => {
                     title.includes('head');
 
                 if (isEngineering && isIndia && !isTooSenior) {
-                    const jobUrl = job.positionUrl 
-                        ? `https://morganstanley.eightfold.ai${job.positionUrl}` 
-                        : `https://morganstanley.eightfold.ai/careers?pid=${job.id}`;
+                    const jobUrl = job.canonicalPositionUrl || `https://portal.careers.hsbc.com/careers/job/${job.id}`;
                     
                     if (processedLinks.has(jobUrl)) {
                         continue;
                     }
                     processedLinks.add(jobUrl);
 
-                    const exists = await JobPosting.findOne({ portalLink: jobUrl });
+                    const exists = await JobPosting.findOne({ applyLink: jobUrl });
                     
                     if (!exists) {
                         try {
                             await JobPosting.create({
-                                companyName: 'Morgan Stanley',
+                                companyName: 'HSBC',
                                 role: job.name || 'Software Engineer',
-                                location: Array.isArray(job.locations) ? job.locations.join(', ') : (job.location || 'India (Multiple)'),
-                                salary: 'Competitive', 
+                                location: job.location || 'India',
+                                salaryRaw: 'Competitive', 
                                 applyLink: jobUrl,
-                                postedDate: job.postedTs ? new Date(job.postedTs * 1000) : new Date() 
+                                scrapedAt: job.postedTs ? new Date(job.postedTs * 1000) : new Date() 
                             });
                             jobsAdded++;
                         } catch (dbError) {
@@ -106,23 +92,29 @@ const scrapeMorganStanleyJobs = async () => {
                             }
                         }
                     }
+                    // jobsAdded++;
                 }
             }
             
             start += jobs.length;
+            
+            if (jobs.length < 50) {
+                hasMore = false;
+            }
         }
 
-        console.log(`[+] Scanned ${totalJobsFound} total global technology jobs for Morgan Stanley.`);
+        console.log(`[+] Scanned ${totalJobsFound} targeted tech jobs for HSBC.`);
         
         if (jobsAdded > 0) {
-            console.log(`[+] Added ${jobsAdded} new India Engineering jobs for Morgan Stanley.`);
+            console.log(`[+] Added ${jobsAdded} new India Engineering jobs for HSBC.`);
         } else {
-            console.log(`[-] No new India Engineering jobs found for Morgan Stanley right now.`);
+            console.log(`[-] No new India Engineering jobs found for HSBC right now.`);
         }
 
     } catch (error) {
-        console.error("Morgan Stanley Scraper Error:", error.message);
+        console.error("HSBC Scraper Error:", error.message);
     }
 };
 
-module.exports = scrapeMorganStanleyJobs;
+module.exports = scrapeHsbcJobs;
+// scrapeHsbcJobs();

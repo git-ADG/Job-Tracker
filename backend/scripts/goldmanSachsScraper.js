@@ -57,7 +57,15 @@ const scrapeGoldmanSachsJobs = async () => {
                 rawLocation.includes('hyderabad') ||
                 rawLocation.includes('remote - ind');
 
-            if (isEngineering && isIndia && job.status !== 'CLOSED') {
+            const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
+
+            if (isEngineering && isIndia && !isTooSenior && job.status !== 'CLOSED') {
                 
                 const jobUrl = `https://higher.gs.com/roles/${job.roleId}`;
                 

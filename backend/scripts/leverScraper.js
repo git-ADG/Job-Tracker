@@ -52,8 +52,16 @@ const scrapeLeverJobs = async () => {
                                 location.includes('noida') ||
                                 location.includes('gurugram') ||
                                 location.includes('gurgaon');
+
+                const isTooSenior = 
+                    title.includes('manager') || 
+                    title.includes('director') || 
+                    title.includes('vp') || 
+                    title.includes('vice president') || 
+                    title.includes('principal') ||
+                    title.includes('head');
                 
-                return isEngineer && isIndia;
+                return isEngineer && isIndia && !isTooSenior;
             });
 
             if (techJobs.length === 0) {
