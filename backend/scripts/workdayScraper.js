@@ -61,7 +61,7 @@ const scrapeWorkdayJobs = async () => {
 
     for (const company of workdayCompanies) {
         try {
-            console.log(`\n🔍 Cracking ${company.name.toUpperCase()}...`);
+            console.log(`\n Cracking ${company.name.toUpperCase()}...`);
             
             let offset = 0;
             const limit = 20;

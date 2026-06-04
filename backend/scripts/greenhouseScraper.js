@@ -19,7 +19,7 @@ const scrapeGreenhouseJobs = async () => {
 
     for (const company of greenhouseCompanies) {
         try {
-            console.log(`\n🔍 Checking ${company.toUpperCase()}...`);
+            console.log(`\n Checking ${company.toUpperCase()}...`);
             const apiUrl = `https://boards-api.greenhouse.io/v1/boards/${company}/jobs`;
             
             const response = await fetch(apiUrl);

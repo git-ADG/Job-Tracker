@@ -19,7 +19,7 @@ const scrapeLeverJobs = async () => {
 
     for (const company of leverCompanies) {
         try {
-            console.log(`\n🔍 Checking ${company.toUpperCase()}...`);
+            console.log(`\n Checking ${company.toUpperCase()}...`);
     
             const apiUrl = `https://api.lever.co/v0/postings/${company}?mode=json`;
             
