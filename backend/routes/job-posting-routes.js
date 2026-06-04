@@ -6,7 +6,7 @@ const JobPosting = require('../models/job-posting.js');
 //in use in current prod
 router.get('/', async (req, res) => {
     try {
-        const jobs = await JobPosting.find().sort({ scrapedAt: -1 });
+        const jobs = await JobPosting.find().sort();
         return res.status(200).json(jobs);
     } catch(err) {
         console.error("Database fetch error:", err);

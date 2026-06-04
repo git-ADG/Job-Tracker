@@ -110,15 +110,14 @@ const runAllScrapers = async () => {
         await executeScraper('Atlassian', scrapeAtlassianJobs);
         await executeScraper('Intuit', scrapeIntuitJobs);
         await executeScraper('Uber', scrapeUberJobs);
+        await executeScraper('Cisco', scrapeCiscoJobs);
+        await executeScraper('GitHub', scrapeGithubJobs);
+        await executeScraper('Salesforce', scrapeSalesforceJobs);
 
         await executeScraper('GreenHouse', scrapeGreenhouseJobs);
         await executeScraper('Lever', scrapeLeverJobs);
 
         await executeScraper('Workday', scrapeWorkdayJobs);
-
-        await executeScraper('GitHub', scrapeGithubJobs);
-        await executeScraper('Salesforce', scrapeSalesforceJobs);
-        await executeScraper('Cisco', scrapeCiscoJobs);
 
         await executeScraper('Morgan Stanley', scrapeMorganStanleyJobs);
         await executeScraper('HSBC', scrapeHsbcJobs);
