@@ -20,6 +20,7 @@ const scrapeIntuitJobs = require('./intuitScraper');
 const scrapeUberJobs = require('./uberScraper');
 const scrapeCiscoJobs = require('./ciscoScraper');
 const scrapeHsbcJobs = require('./hsbcScraper');
+const scrapeUbsJobs = require('./ubsScraper');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 const JobPosting = require('../models/job-posting');
@@ -73,7 +74,7 @@ const clearDatabase = async () => {
 //master runner
 //runs all scripts whenever called by the node cron job
 const runAllScrapers = async () => {
-    console.log("[MASTER RUNNER] Initiating FAANG Scrape Sequence...");
+    console.log("[MASTER RUNNER] Initiating Scrape Sequence...");
     const startTime = Date.now();
     let reportLogs = [];
     let criticalError = null;
@@ -101,27 +102,26 @@ const runAllScrapers = async () => {
 
         await executeScraper('Google', scrapeGoogleJobs);
         await executeScraper('Amazon', scrapeAmazonJobs);
-
         await executeScraper('Apple', scrapeAppleJobs);
         await executeScraper('Microsoft', scrapeMicrosoftJobs);
+        await executeScraper('Atlassian', scrapeAtlassianJobs);
+        await executeScraper('Intuit', scrapeIntuitJobs);
+        await executeScraper('Uber', scrapeUberJobs);
 
         await executeScraper('GreenHouse', scrapeGreenhouseJobs);
         await executeScraper('Lever', scrapeLeverJobs);
 
         await executeScraper('Workday', scrapeWorkdayJobs);
 
-        await executeScraper('Atlassian', scrapeAtlassianJobs);
         await executeScraper('GitHub', scrapeGithubJobs);
-        await executeScraper('Goldman Sachs', scrapeGoldmanSachsJobs);
         await executeScraper('Salesforce', scrapeSalesforceJobs);
-        await executeScraper('Morgan Stanley', scrapeMorganStanleyJobs);
-        await executeScraper('Intuit', scrapeIntuitJobs);
-        await executeScraper('Uber', scrapeUberJobs);
-
         await executeScraper('Cisco', scrapeCiscoJobs);
 
+        await executeScraper('Morgan Stanley', scrapeMorganStanleyJobs);
         await executeScraper('HSBC', scrapeHsbcJobs);
-
+        await executeScraper('Goldman Sachs', scrapeGoldmanSachsJobs);
+        await executeScraper('UBS', scrapeUbsJobs);
+    
         const timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
         console.log(`[MASTER RUNNER] All scrapes completed successfully in ${timeTaken} seconds.`);
 
