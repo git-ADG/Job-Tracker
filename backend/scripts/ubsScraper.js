@@ -1,4 +1,4 @@
-// const fetch = require('node-fetch');
+const axios = require('axios');
 const https = require('https');
 const crypto = require('crypto');
 const JobPosting = require('../models/job-posting');
@@ -12,96 +12,113 @@ const cloudflareBypassAgent = new https.Agent({
 
 const scrapeUbsJobs = async () => {
     try {
-        console.log("Initiating UBS Kenexa Session-Bypass Scraper...");
+        console.log("Initiating UBS Kenexa Targeted API Scraper...");
         
-        const initResponse = await fetch('https://jobs.ubs.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25008&siteid=5012', {
+        let jobsAdded = 0;
+        let totalJobsFound = 0;
+        let pageNumber = 1;
+        let hasMore = true;
+
+        const initUrl = 'https://jobs.ubs.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25008&siteid=5012';
+        
+        const initResponse = await axios.get(initUrl, {
             headers: {
                 'Accept': 'text/html,application/xhtml+xml',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             },
-            agent: cloudflareBypassAgent 
+            httpsAgent: cloudflareBypassAgent
         });
 
-        const rawCookies = typeof initResponse.headers.getSetCookie === 'function' 
-            ? initResponse.headers.getSetCookie() 
-            : [initResponse.headers.get('set-cookie')].filter(Boolean);
-            
-        const sessionCookie = rawCookies.map(c => c.split(';')[0]).join('; ');
+        const rawCookies = initResponse.headers['set-cookie'] || [];
+        const sessionCookies = rawCookies.map(c => c.split(';')[0]);
+        const cookieString = sessionCookies.join('; ');
 
-        const url = "https://jobs.ubs.com/TGnewUI/Search/api/search/getsearchresults?partnerid=25008&siteid=5012";
         
-        const payload = {
-            "partnerId": "25008",
-            "siteId": "5012",
-            "keyword": "Software Engineer",
-            "location": "India",
-            "keywordName": "",
-            "locationName": "",
-            "searchType": "0",
-            "linkId": "0",
-            "pageNumber": 1,
-            "pageSize": 50
-        };
+        const apiUrl = "https://jobs.ubs.com/TGnewUI/Search/api/search/getsearchresults?partnerid=25008&siteid=5012";
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json, text/javascript, */*; q=0.01',
-                'Content-Type': 'application/json',
-                'Origin': 'https://jobs.ubs.com',
-                'Referer': 'https://jobs.ubs.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25008&siteid=5012',
-                'Cookie': sessionCookie,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            },
-            body: JSON.stringify(payload),
-            agent: cloudflareBypassAgent 
-        });
+        while (hasMore) {
+            const payload = {
+                "partnerId": "25008",
+                "siteId": "5012",
+                "keyword": "Software Engineer", 
+                "location": "India",            
+                "keywordName": "",
+                "locationName": "",
+                "searchType": "0",
+                "linkId": "0",
+                "pageNumber": pageNumber,
+                "pageSize": 50
+            };
 
-        if (!response.ok) {
-            console.error(`UBS API rejected with status: ${response.status}`);
-            return;
-        }
+            const response = await axios.post(apiUrl, payload, {
+                headers: {
+                    'Accept': 'application/json, text/javascript, */*; q=0.01',
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://jobs.ubs.com',
+                    'Referer': 'https://jobs.ubs.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25008&siteid=5012',
+                    'Cookie': cookieString,
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                httpsAgent: cloudflareBypassAgent
+            });
 
-        const jsonResponse = await response.json();
-        const jobs = jsonResponse.GetSearchResultWithSelectedFacets?.JobSearchResult?.JobPostings || [];
-        let jobsAdded = 0;
+            const jobs = response.data.GetSearchResultWithSelectedFacets?.JobSearchResult?.JobPostings || [];
+            
+            if (jobs.length === 0) {
+                hasMore = false;
+                break;
+            }
 
-        console.log(`[+] Downloaded ${jobs.length} raw results from UBS... filtering...`);
+            totalJobsFound += jobs.length;
 
-        for (const job of jobs) {
-            const title = (job.Title || '').toLowerCase();
-            const rawJobString = JSON.stringify(job).toLowerCase();
+            for (const job of jobs) {
+                const title = (job.Title || '').toLowerCase();
+                const rawJobString = JSON.stringify(job).toLowerCase();
 
-            const isEngineering = 
-                title.includes('software') || 
-                title.includes('engineer') || 
-                title.includes('developer') || 
-                title.includes('sde') || 
-                title.includes('data');
+                const isEngineering = 
+                    title.includes('software') || 
+                    title.includes('engineer') || 
+                    title.includes('developer') || 
+                    title.includes('sde') || 
+                    title.includes('data');
 
-            const isIndia = rawJobString.includes('india') || rawJobString.includes('pune') || rawJobString.includes('mumbai');
+                const isIndia = rawJobString.includes('india') || rawJobString.includes('pune') || rawJobString.includes('mumbai');
 
-            if (isEngineering && isIndia) {
-                const jobId = job.Id;
-                const jobUrl = `https://jobs.ubs.com/TGnewUI/Search/home/VacancyViews/VacancyDetails?partnerid=25008&siteid=5012&jobId=${jobId}`;
+                if (isEngineering && isIndia) {
+                    const jobId = job.Id;
+                    const jobUrl = `https://jobs.ubs.com/TGnewUI/Search/home/VacancyViews/VacancyDetails?partnerid=25008&siteid=5012&jobId=${jobId}`;
 
-                const exists = await JobPosting.findOne({ portalLink: jobUrl });
+                    const exists = await JobPosting.findOne({ applyLink: jobUrl });
 
-                if (!exists) {
-                    await JobPosting.create({
-                        companyName: 'UBS',
-                        role: job.Title || 'Software Engineer',
-                        location: job.Location || 'India',
-                        salary: 'Competitive',
-                        applyLink: jobUrl,
-                        postedDate: job.PostedDate ? new Date(job.PostedDate) : new Date()
-                    });
-                    jobsAdded++;
+                    if (!exists) {
+                        try {
+                            await JobPosting.create({
+                                companyName: 'UBS',
+                                role: job.Title || 'Software Engineer',
+                                location: job.Location || 'India',
+                                salaryRaw: 'Competitive',
+                                applyLink: jobUrl,
+                                scrapedAt: job.PostedDate ? new Date(job.PostedDate) : new Date()
+                            });
+                            jobsAdded++;
+                        } catch (dbError) {
+                            if (dbError.code !== 11000) {
+                                throw dbError;
+                            }
+                        }
+                    }
                 }
-                // jobsAdded++;
+            }
+            
+            if (jobs.length < 50) {
+                hasMore = false;
+            } else {
+                pageNumber++;
             }
         }
 
+        console.log(`[+] Scanned ${totalJobsFound} targeted tech jobs from UBS API.`);
+        
         if (jobsAdded > 0) {
             console.log(`[+] Added ${jobsAdded} new India Engineering jobs for UBS.`);
         } else {
