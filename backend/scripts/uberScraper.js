@@ -16,7 +16,7 @@ const scrapeUberJobs = async () => {
         let jobsAdded = 0;
         let totalJobsFound = 0;
 
-        console.log(`🚀 Initiating Uber Stealth Scraper...`);
+        console.log(` Initiating Uber Stealth Scraper...`);
 
         while (hasMore) {
             const url = 'https://www.uber.com/api/loadSearchJobsResults?localeCode=en';
