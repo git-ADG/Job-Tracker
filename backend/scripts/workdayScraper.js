@@ -133,7 +133,7 @@ const scrapeWorkdayJobs = async () => {
                                     location: job.locationsText || 'India',
                                     salaryRaw: "Competitive", 
                                     applyLink: jobUrl,
-                                    scrapedAt: job.postedOn ? new Date(job.postedOn) : new Date()
+                                    //scrapedAt: job.postedOn ? new Date(job.postedOn) : new Date()
                                 });
                                 jobsAdded++;
                                 totalAddedAcrossAll++;
