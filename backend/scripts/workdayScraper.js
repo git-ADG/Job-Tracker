@@ -17,6 +17,12 @@ const workdayCompanies = [
         searchText: "software engineer india"
     },
     {
+        name: "Walmart",
+        url: "https://walmart.wd5.myworkdayjobs.com/wday/cxs/walmart/WalmartExternal/jobs",
+        siteBaseUrl : "https://walmart.wd5.myworkdayjobs.com/en-US/WalmartExternal",
+        searchText: "software engineer india"
+    },
+    {
         name: "Mastercard",
         apiUrl: "https://mastercard.wd1.myworkdayjobs.com/wday/cxs/mastercard/CorporateCareers/jobs",
         siteBaseUrl: "https://mastercard.wd1.myworkdayjobs.com/en-US/CorporateCareers",
@@ -38,6 +44,12 @@ const workdayCompanies = [
         name: "Adobe",
         apiUrl: "https://adobe.wd5.myworkdayjobs.com/wday/cxs/adobe/external_experienced/jobs",
         siteBaseUrl: "https://adobe.wd5.myworkdayjobs.com/en-US/external_experienced",
+        searchText: "software engineer india"
+    },
+    {
+        name: "BlackRock",
+        apiurl: "https://blackrock.wd1.myworkdayjobs.com/wday/cxs/blackrock/BlackRock_Professional/jobs",
+        siteBaseUrl : "https://blackrock.wd1.myworkdayjobs.com/en-US/BlackRock_Professional" ,
         searchText: "software engineer india"
     }
 ];
