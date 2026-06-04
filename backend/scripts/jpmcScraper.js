@@ -49,7 +49,15 @@ const scrapeJpmcJobs = async () => {
                     rawJobString.includes('engineering') ||
                     rawJobString.includes('technology');
 
-                if (isEngineering) {
+                    const isTooSenior = 
+                        title.includes('manager') || 
+                        title.includes('director') || 
+                        title.includes('vp') || 
+                        title.includes('vice president') || 
+                        title.includes('principal') ||
+                        title.includes('head');
+
+                if (isEngineering && !isTooSenior) {
                     const jobUrl = `https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/${job.Id}`;
                     
                     if (processedLinks.has(jobUrl)) {
