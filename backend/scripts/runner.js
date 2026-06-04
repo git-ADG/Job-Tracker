@@ -119,8 +119,6 @@ const runAllScrapers = async () => {
 
         await executeScraper('Workday', scrapeWorkdayJobs);
 
-
-
         await executeScraper('Morgan Stanley', scrapeMorganStanleyJobs);
         await executeScraper('HSBC', scrapeHsbcJobs);
         await executeScraper('Goldman Sachs', scrapeGoldmanSachsJobs);
