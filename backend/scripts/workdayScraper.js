@@ -18,7 +18,7 @@ const workdayCompanies = [
     },
     {
         name: "Walmart",
-        url: "https://walmart.wd5.myworkdayjobs.com/wday/cxs/walmart/WalmartExternal/jobs",
+        apiUrl: "https://walmart.wd5.myworkdayjobs.com/wday/cxs/walmart/WalmartExternal/jobs", 
         siteBaseUrl : "https://walmart.wd5.myworkdayjobs.com/en-US/WalmartExternal",
         searchText: "software engineer india"
     },
@@ -48,7 +48,7 @@ const workdayCompanies = [
     },
     {
         name: "BlackRock",
-        apiurl: "https://blackrock.wd1.myworkdayjobs.com/wday/cxs/blackrock/BlackRock_Professional/jobs",
+        apiUrl: "https://blackrock.wd1.myworkdayjobs.com/wday/cxs/blackrock/BlackRock_Professional/jobs", 
         siteBaseUrl : "https://blackrock.wd1.myworkdayjobs.com/en-US/BlackRock_Professional" ,
         searchText: "software engineer india"
     }
