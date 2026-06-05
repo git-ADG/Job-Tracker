@@ -8,7 +8,7 @@ const JobPosting = require('../models/job-posting');
 //const MONGO_URI = process.env.MONGO_URI;
 
 //not all working, need to check the paths
-const greenhouseCompanies = ['stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'razorpaysoftwareprivatelimited', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion'];
+const greenhouseCompanies = ['towerresearchcapital','stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'razorpaysoftwareprivatelimited', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion'];
 
 //clean json formatted response
 const scrapeGreenhouseJobs = async () => {
