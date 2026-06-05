@@ -8,17 +8,38 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
+    
+    const [excludeFilter, setExcludeFilter] = useState([]);
+    const [excludeInput, setExcludeInput] = useState('');
 
-    const filteredJobs = jobs.filter(
-        (job) => {
-            const matchesSearch = (job.companyName?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    const handleAddExclude = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const keyword = excludeInput.trim().toLowerCase();
+            
+            if (keyword && !excludeFilter.includes(keyword)) {
+                setExcludeFilter([...excludeFilter, keyword]);
+            }
+            setExcludeInput(''); 
+        }
+    };
+
+    const handleRemoveExclude = (keywordToRemove) => {
+        setExcludeFilter(excludeFilter.filter(keyword => keyword !== keywordToRemove));
+    };
+
+    const filteredJobs = jobs.filter((job) => {
+        const matchesSearch = (job.companyName?.toLowerCase() || '').includes(searchTerm.toLowerCase())
             || (job.role?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
-            const matchesLocation = (job.location?.toLowerCase() || '').includes(locationFilter.toLowerCase());
+        const matchesLocation = (job.location?.toLowerCase() || '').includes(locationFilter.toLowerCase());
+        
+        const matchesExclude = excludeFilter.some(keyword => 
+            (job.role?.toLowerCase() || '').includes(keyword)
+        );
 
-            return matchesSearch && matchesLocation;
-        }
-    ); 
+        return matchesSearch && matchesLocation && !matchesExclude;
+    }); 
 
     const fetchJobs = async () => {
         try {
@@ -78,11 +99,63 @@ const Dashboard = () => {
             </header>
 
             {/* Live UI State Filters */}
-            <div className='filter-section' style={{marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', 
-        borderRadius: '8px', display: 'flex', gap: '15px', flexWrap: 'wrap'}}>
-                <p style={{ margin: 'auto 0', fontWeight: 'bold' }}>Filters</p>
-                <input type="text" placeholder="search role or company" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{padding: '8px', flex: 1, minWidth: '200px', border: '1px solid #ccc', borderRadius: '4px'}}/>
-                <input type="text" placeholder="search location" value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} style={{padding: '8px', flex: 1, minWidth: '200px', border: '1px solid #ccc', borderRadius: '4px'}}/>
+            <div className='filter-section' style={{
+                marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', 
+                borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '15px'
+            }}>
+                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <p style={{ margin: '0', fontWeight: 'bold' }}>Filters</p>
+                    <input 
+                        type="text" placeholder="search role or company" 
+                        value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+                        style={{padding: '8px', flex: 1, minWidth: '200px', border: '1px solid #ccc', borderRadius: '4px'}}
+                    />
+                    <input 
+                        type="text" placeholder="search location" 
+                        value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} 
+                        style={{padding: '8px', flex: 1, minWidth: '200px', border: '1px solid #ccc', borderRadius: '4px'}}
+                    />
+                </div>
+
+                {/* Exclude Filter UI */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <p style={{ margin: '0', fontWeight: 'bold', fontSize: '14px', color: '#dc3545' }}>Exclude Roles:</p>
+                        <input 
+                            type="text" 
+                            placeholder="type 'senior' and press Enter" 
+                            value={excludeInput} 
+                            onChange={(e) => setExcludeInput(e.target.value)}
+                            onKeyDown={handleAddExclude}
+                            style={{padding: '6px 10px', minWidth: '200px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px'}}
+                        />
+                    </div>
+                    
+                    {/* Render the chips if there are any exclusions */}
+                    {excludeFilter.length > 0 && (
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            {excludeFilter.map((keyword, index) => (
+                                <span key={index} style={{
+                                    display: 'flex', alignItems: 'center', gap: '5px',
+                                    backgroundColor: '#fee2e2', color: '#dc3545', 
+                                    padding: '4px 10px', borderRadius: '15px', fontSize: '13px', fontWeight: 'bold'
+                                }}>
+                                    {keyword}
+                                    <button 
+                                        onClick={() => handleRemoveExclude(keyword)}
+                                        style={{
+                                            background: 'none', border: 'none', color: '#dc3545', 
+                                            cursor: 'pointer', padding: '0', marginLeft: '2px', fontSize: '14px', lineHeight: '1'
+                                        }}
+                                        aria-label="Remove"
+                                    >
+                                        &times;
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Infinite-capable data grid output */}
