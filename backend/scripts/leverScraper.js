@@ -8,7 +8,7 @@ const JobPosting = require('../models/job-posting');
 //const MONGO_URI = process.env.MONGO_URI;
 
 //not all working need to check the paths
-const leverCompanies = ['stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'razorpaysoftwareprivatelimited', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion'];
+const leverCompanies = ['towerresearchcapital','stripe', 'discord', 'airbnb', 'twilio', 'pinterest', 'figma', 'razorpaysoftwareprivatelimited', 'swiggy', 'cred', 'zepto', 'postman', 'vercel', 'notion'];
 
 //clean json formatted data
 const scrapeLeverJobs = async () => {
@@ -70,7 +70,7 @@ const scrapeLeverJobs = async () => {
             }
 
             const formattedJobs = techJobs.map(job => ({
-                companyName: (company == 'razorpaysoftwareprivatelimited') ? 'Razorpay' :  company.charAt(0).toUpperCase() + company.slice(1),
+                companyName: (company == 'razorpaysoftwareprivatelimited') ? 'Razorpay' : (company == 'towerresearchcapital') ? 'Tower Research Capital' : company.charAt(0).toUpperCase() + company.slice(1),
                 role: String(job.text),
                 location: String(job.categories?.location || 'India'),
                 applyLink: String(job.hostedUrl), 
