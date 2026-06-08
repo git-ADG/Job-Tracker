@@ -44,6 +44,7 @@ The automated pipeline actively extracts roles from a singular continuous matrix
 * Cisco
 * Uber
 * Intuit
+* Tower Research Capital
 * JPMorgan Chase & Co.
 * Morgan Stanley
 * Goldman Sachs
