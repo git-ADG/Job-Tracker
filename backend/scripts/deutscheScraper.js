@@ -95,7 +95,7 @@ const scrapeDeutscheBankJobs = async () => {
                     rawJobString.includes('chennai');
 
                 if (isEngineering && isIndia && !isTooSenior) {
-                    const jobUrl = job.PositionURI || `https://careers.db.com/professionals/search-roles/#/professional/job/${job.PositionID}`;
+                    const jobUrl = `https://careers.db.com/professionals/search-roles/#/professional/job/${job.PositionID}`;
                     
                     if (processedLinks.has(jobUrl)) {
                         continue;
