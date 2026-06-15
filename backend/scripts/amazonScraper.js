@@ -24,6 +24,8 @@ const scrapeAmazonJobs = async () => {
 
         const jobsData = response.data.jobs;
 
+        // console.log(jobsData);
+
         if (!jobsData || jobsData.length === 0) {
             console.log("[-] No jobs found or Amazon blocked the request.");
             return;
@@ -33,7 +35,7 @@ const scrapeAmazonJobs = async () => {
             const country = (job.country_code || job.country || "").toUpperCase();
             const locationString = (job.location || "").toUpperCase();
             
-            return country === 'IND' || country === 'IN' || locationString.includes('INDIA');
+            return country === 'IND' || country === 'IN' || locationString.includes('IND') || locationString.includes('INDIA');
         });
 
         if (indiaJobs.length === 0) {
@@ -63,6 +65,8 @@ const scrapeAmazonJobs = async () => {
                 await JobPosting.create(job);
                 addedCount++;
             }
+            // console.log(job);
+            // addedCount++;
         }
 
         console.log(`Success! Inserted ${addedCount} brand new Amazon jobs into your database.`);
@@ -71,5 +75,6 @@ const scrapeAmazonJobs = async () => {
         console.error("Amazon Request Failed:", error.message);
     }
 };
+// scrapeAmazonJobs();
 
 module.exports = scrapeAmazonJobs;
