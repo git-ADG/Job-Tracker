@@ -35,7 +35,7 @@ const scrapeAmazonJobs = async () => {
             const country = (job.country_code || job.country || "").toUpperCase();
             const locationString = (job.location || "").toUpperCase();
             
-            return country === 'IND' || country === 'IN' || locationString.includes('INDIA');
+            return country === 'IND' || country === 'IN' || locationString.includes('IND') || locationString.includes('INDIA');
         });
 
         if (indiaJobs.length === 0) {
@@ -66,6 +66,7 @@ const scrapeAmazonJobs = async () => {
                 addedCount++;
             }
             // console.log(job);
+            // addedCount++;
         }
 
         console.log(`Success! Inserted ${addedCount} brand new Amazon jobs into your database.`);
