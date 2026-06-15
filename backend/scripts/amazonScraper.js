@@ -24,6 +24,8 @@ const scrapeAmazonJobs = async () => {
 
         const jobsData = response.data.jobs;
 
+        console.log(jobsData);
+
         if (!jobsData || jobsData.length === 0) {
             console.log("[-] No jobs found or Amazon blocked the request.");
             return;
@@ -63,6 +65,7 @@ const scrapeAmazonJobs = async () => {
                 await JobPosting.create(job);
                 addedCount++;
             }
+            // console.log(job);
         }
 
         console.log(`Success! Inserted ${addedCount} brand new Amazon jobs into your database.`);
@@ -71,5 +74,6 @@ const scrapeAmazonJobs = async () => {
         console.error("Amazon Request Failed:", error.message);
     }
 };
+// scrapeAmazonJobs();
 
 module.exports = scrapeAmazonJobs;
