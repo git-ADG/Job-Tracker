@@ -24,7 +24,7 @@ const scrapeAmazonJobs = async () => {
 
         const jobsData = response.data.jobs;
 
-        console.log(jobsData);
+        // console.log(jobsData);
 
         if (!jobsData || jobsData.length === 0) {
             console.log("[-] No jobs found or Amazon blocked the request.");
