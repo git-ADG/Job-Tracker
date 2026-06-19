@@ -27,29 +27,26 @@ app.use((req, res, next) => {
     next();
 });
 
-const standardLimit = rateLimit({
-    windowMs : 15 * 60 * 1000,
-    limit : 200,
-    standardHeaders : true,
-    legacyHeaders : false,
-    message : {error : "Too many requests, please try again after 15 mins"},
-    statusCode : 429,
-    store : new rateLimit.RedisStore({
-        sendCommand : (...args) => redisClient.sendCommand(args),
-        prefix : 'rl:standard'
+const standardLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000, 
+    max: 100,
+    legacyHeaders: false, 
+    message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
+    
+    store: new RedisStore({
+        sendCommand: (...args) => redisClient.sendCommand(args),
+        prefix: 'rl:standard:' 
     })
 });
 
-const strictLimit = rateLimit({
-    windowMs : 5 * 60 * 1000,
-    limit : 5,
-    standardHeaders : true,
-    legacyHeaders : false,
-    message : {error : "Too many requests, please try again after 15 mins"},
-    statusCode : 429,
-    store : new rateLimit.RedisStore({
-        sendCommand : (...args) => redisClient.sendCommand(args),
-        prefix : 'rl:strict'
+
+const strictLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, 
+    max: 5,
+    message: { error: 'Too many attempts, please try again later.' },
+    store: new RedisStore({
+        sendCommand: (...args) => redisClient.sendCommand(args),
+        prefix: 'rl:strict:' 
     })
 });
 
@@ -70,11 +67,11 @@ app.use(cors(
 
 app.use(bodyParser.json());
 
-app.use(standardLimit);
+app.use(standardLimiter);
 
-app.use('/api/users/login', strictLimit);
-app.use('/api/users/register', strictLimit);
-app.use('/api/admin/force-scrape', strictLimit);
+app.use('/api/users/login', strictLimiter);
+app.use('/api/users/register', strictLimiter);
+app.use('/api/admin/force-scrape', strictLimiter);
 
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/jobs', jobRoutes);
