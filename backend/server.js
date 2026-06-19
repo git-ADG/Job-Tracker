@@ -6,7 +6,7 @@ const cron = require('node-cron');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const { createClient } = require('redis');
-const rateLimit = require('rate-limit-redis');
+const { rateLimit } = require('rate-limit-redis');
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
