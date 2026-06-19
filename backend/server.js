@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const { createClient } = require('redis');
 const {rateLimit} = require('express-rate-limit');
-const {RedisStore} = require('rate-limit-redis')l
+const {RedisStore} = require('rate-limit-redis');
 
 
 
