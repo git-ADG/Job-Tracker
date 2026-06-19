@@ -14,7 +14,7 @@ const scrapeAmazonJobs = async () => {
     console.log("Initiating API request to Amazon Jobs...");
 
     try {
-        const apiUrl = 'https://www.amazon.jobs/en/search.json?offset=0&result_limit=50&sort=recent&category%5B%5D=software-development&country%5B%5D=IND';        
+        const apiUrl = 'https://www.amazon.jobs/en/search.json?offset=0&result_limit=100&sort=recent&category%5B%5D=software-development&country%5B%5D=IND';        
         const response = await axios.get(apiUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36',
