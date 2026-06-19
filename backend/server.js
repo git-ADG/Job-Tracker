@@ -6,6 +6,7 @@ const cron = require('node-cron');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const { createClient } = require('redis');
+const rateLimit = require('rate-limit-redis');
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +27,32 @@ app.use((req, res, next) => {
     next();
 });
 
+const standardLimit = rateLimit({
+    windowMs : 15 * 60 * 1000,
+    limit : 200,
+    standardHeaders : true,
+    legacyHeaders : false,
+    message : {error : "Too many requests, please try again after 15 mins"},
+    statusCode : 429,
+    store : new rateLimit.RedisStore({
+        sendCommand : (...args) => redisClient.sendCommand(args),
+        prefix : 'rl:standard'
+    })
+});
+
+const strictLimit = rateLimit({
+    windowMs : 5 * 60 * 1000,
+    limit : 5,
+    standardHeaders : true,
+    legacyHeaders : false,
+    message : {error : "Too many requests, please try again after 15 mins"},
+    statusCode : 429,
+    store : new rateLimit.RedisStore({
+        sendCommand : (...args) => redisClient.sendCommand(args),
+        prefix : 'rl:strict'
+    })
+});
+
 const applicationsRoutes = require('./routes/applications-routes');
 const jobRoutes = require('./routes/job-routes');
 const userRoutes = require('./routes/user-routes');
@@ -42,6 +69,12 @@ app.use(cors(
 ));
 
 app.use(bodyParser.json());
+
+app.use(standardLimit);
+
+app.use('/api/users/login', strictLimit);
+app.use('/api/users/register', strictLimit);
+app.use('/api/admin/force-scrape', strictLimit);
 
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/jobs', jobRoutes);
