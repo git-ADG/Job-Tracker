@@ -5,9 +5,26 @@ const bodyParser = require('body-parser');
 const cron = require('node-cron');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const { createClient, RedisClient } = require('redis');
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
+
+const redisClient = createClient({
+    url : process.env.REDIS_URI || 'redis://localhost:6379'
+});
+
+redisClient.on('error', (err) => console.error('Redis client error', err));
+
+(async () => {
+    await RedisClient.connect();
+    console.log("Connected to redis")
+})();
+
+app.use((req, res, next) => {
+    req.redisClient = redisClient;
+    next();
+});
 
 const applicationsRoutes = require('./routes/applications-routes');
 const jobRoutes = require('./routes/job-routes');
