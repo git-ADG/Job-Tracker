@@ -3,6 +3,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const dotenv = require('dotenv');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const { createRedis, createClient } = require('redis');
 
 const scrapeGoogleJobs = require('./googleScraper');
 const scrapeAmazonJobs = require('./amazonScraper');
@@ -129,6 +130,21 @@ const runAllScrapers = async () => {
     
         const timeTaken = ((Date.now() - startTime) / 1000).toFixed(2);
         console.log(`[MASTER RUNNER] All scrapes completed successfully in ${timeTaken} seconds.`);
+
+        try{
+            const redisClient = createClient({
+                url : process.env.REDIS_URI
+            });
+
+            await redisClient.connect();
+            await redisClient.del('job_postings');
+            await redisClient.disconnect();
+            console.log("[REDIS] Cache successfully cleared.");
+            reportLogs.push(`<li><b>Cache:</b> Redis memory successfully invalidated.</li>`);
+        }catch(err){
+            console.error("[REDIS] failed to clear cache:", err.message);
+            reportLogs.push(`<li><b>Cache Warning:</b> Failed to invalidate Redis: ${cacheErr.message}</li>`);
+        }
 
         let currentTotalJobs = 0;
         try {
