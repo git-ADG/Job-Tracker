@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const JobPosting = require('../models/job-posting.js');
+// const redis = require('redis');
 
 //for job postings fetched by scraper scripts
 //in use in current prod
