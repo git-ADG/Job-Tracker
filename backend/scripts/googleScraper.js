@@ -1,4 +1,5 @@
 const axios = require('axios');
+axios.defaults.timeout = 300000;
 //const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');

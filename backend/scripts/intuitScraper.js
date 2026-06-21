@@ -1,4 +1,5 @@
 const axios = require('axios');
+axios.defaults.timeout = 300000;
 const JobPosting = require('../models/job-posting');
 
 const scrapeIntuitJobs = async () => {
