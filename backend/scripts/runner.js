@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const { createRedis, createClient } = require('redis');
+const axios = require('axios');
+axios.defaults.timeout = 300000;
 
 const scrapeGoogleJobs = require('./googleScraper');
 const scrapeAmazonJobs = require('./amazonScraper');
