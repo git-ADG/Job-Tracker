@@ -63,14 +63,20 @@ const scrapeWorkdayJobs = async () => {
     for (const company of workdayCompanies) {
         try {
             console.log(`\n Cracking ${company.name.toUpperCase()}...`);
-            
+
             let offset = 0;
             const limit = 20;
             let hasMore = true;
             let jobsAdded = 0;
             let totalJobsFound = 0;
 
+            const scrapeStartTime = Date.now();
+
             while (hasMore) {
+                if (Date.now() - scrapeStartTime > 300000) {
+                    console.log(`[-] 5-minute loop timeout reached for ${company.name}. Moving to next company.`);
+                    break;
+                }
                 const payload = {
                     appliedFacets: {},
                     limit: limit,
@@ -82,7 +88,7 @@ const scrapeWorkdayJobs = async () => {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                    
+
                         'Origin': 'https://nvidia.wd5.myworkdayjobs.com',
                         'Referer': 'https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite',
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
@@ -91,7 +97,6 @@ const scrapeWorkdayJobs = async () => {
                 });
 
                 const jobsData = response.data.jobPostings || [];
-                const totalAvailable = response.data.total || 0; 
 
                 if (jobsData.length === 0) {
                     hasMore = false;
@@ -136,9 +141,9 @@ const scrapeWorkdayJobs = async () => {
 
                     if (isEngineering && isIndia && !isTooSenior) {
                         const jobUrl = `${company.siteBaseUrl}${job.externalPath}`;
-                        
+
                         const exists = await JobPosting.findOne({ applyLink: jobUrl });
-                        
+
                         if (!exists) {
                             try {
                                 await JobPosting.create({
@@ -162,7 +167,7 @@ const scrapeWorkdayJobs = async () => {
                 }
 
                 offset += limit;
-                if (jobsData.length < limit || offset >= totalAvailable || offset >= 1500) {
+                if (jobsData.length < limit) {
                     hasMore = false; 
                 }
             }
