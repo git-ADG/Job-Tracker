@@ -37,82 +37,98 @@ const scrapeUberJobs = async () => {
                 }
             };
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'accept': 'application/json',
-                    'content-type': 'application/json',
-                    'origin': 'https://www.uber.com',
-                    'referer': 'https://www.uber.com/in/en/careers/list/?department=Engineering&team=Engineering',
-                    'x-csrf-token': 'x', 
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
-                },
-                body: JSON.stringify(payload),
-                agent: cloudflareBypassAgent
-            });
+            const controller = new AbortController();
+            const timeoutID = setTimeout(() => {
+                controller.abort();
+            }, 300000);
 
-            if (!response.ok) {
-                console.error(` Uber API rejected request with status: ${response.status}`);
-                break;
-            }
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'accept': 'application/json',
+                        'content-type': 'application/json',
+                        'origin': 'https://www.uber.com',
+                        'referer': 'https://www.uber.com/in/en/careers/list/?department=Engineering&team=Engineering',
+                        'x-csrf-token': 'x', 
+                        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
+                    },
+                    body: JSON.stringify(payload),
+                    agent: cloudflareBypassAgent,
+                    signal : controller.signal
+                });
+                clearTimeout(timeoutID);
 
-            const jsonResponse = await response.json();
-            //console.log(jsonResponse.data.results);
-            
-            const jobs = jsonResponse.data?.results || [];
+                if (!response.ok) {
+                    console.error(` Uber API rejected request with status: ${response.status}`);
+                    break;
+                }
 
-            if (jobs.length === 0) {
-                hasMore = false;
-                break;
-            }
+                const jsonResponse = await response.json();
+                //console.log(jsonResponse.data.results);
+                
+                const jobs = jsonResponse.data?.results || [];
 
-            totalJobsFound += jobs.length;
+                if (jobs.length === 0) {
+                    hasMore = false;
+                    break;
+                }
 
-            for (const job of jobs) {
-                const title = (job.title || '').toLowerCase();
-                const locationObj = job.location || {};
-                const locationStr = `${locationObj.city || ''}, ${locationObj.country || ''}`.toLowerCase();
+                totalJobsFound += jobs.length;
 
-                const isEngineering = 
-                    title.includes('software') || 
-                    title.includes('engineer') || 
-                    title.includes('developer') || 
-                    title.includes('sde') || 
-                    title.includes('data');
+                for (const job of jobs) {
+                    const title = (job.title || '').toLowerCase();
+                    const locationObj = job.location || {};
+                    const locationStr = `${locationObj.city || ''}, ${locationObj.country || ''}`.toLowerCase();
 
-                const isTooSenior = 
-                    title.includes('manager') || 
-                    title.includes('director') || 
-                    title.includes('vp') || 
-                    title.includes('vice president') || 
-                    title.includes('principal') ||
-                    title.includes('head');
+                    const isEngineering = 
+                        title.includes('software') || 
+                        title.includes('engineer') || 
+                        title.includes('developer') || 
+                        title.includes('sde') || 
+                        title.includes('data');
 
-                const isIndia = locationStr.includes('ind') || locationStr.includes('bangalore') || locationStr.includes('hyderabad');
+                    const isTooSenior = 
+                        title.includes('manager') || 
+                        title.includes('director') || 
+                        title.includes('vp') || 
+                        title.includes('vice president') || 
+                        title.includes('principal') ||
+                        title.includes('head');
 
-                if (isEngineering && isIndia && !isTooSenior) {
-                    const jobUrl = `https://www.uber.com/global/en/careers/list/${job.id}`;
-                    
-                    const exists = await JobPosting.findOne({ portalLink: jobUrl });
-                    
-                    if (!exists) {
-                        await JobPosting.create({
-                            companyName: 'Uber',
-                            role: job.title || 'Software Engineer',
-                            location: `${locationObj.city || 'India'}, ${locationObj.region || ''}`,
-                            salary: 'Competitive', 
-                            applyLink: jobUrl,
-                            postedDate: job.creationDate ? new Date(job.creationDate) : new Date() 
-                        });
-                        jobsAdded++;
+                    const isIndia = locationStr.includes('ind') || locationStr.includes('bangalore') || locationStr.includes('hyderabad');
+
+                    if (isEngineering && isIndia && !isTooSenior) {
+                        const jobUrl = `https://www.uber.com/global/en/careers/list/${job.id}`;
+                        
+                        const exists = await JobPosting.findOne({ portalLink: jobUrl });
+                        
+                        if (!exists) {
+                            await JobPosting.create({
+                                companyName: 'Uber',
+                                role: job.title || 'Software Engineer',
+                                location: `${locationObj.city || 'India'}, ${locationObj.region || ''}`,
+                                salary: 'Competitive', 
+                                applyLink: jobUrl,
+                                postedDate: job.creationDate ? new Date(job.creationDate) : new Date() 
+                            });
+                            jobsAdded++;
+                        }
                     }
                 }
-            }
-            
-            if (jobs.length < 100) {
-                hasMore = false;
-            } else {
-                page++;
+                
+                if (jobs.length < 100) {
+                    hasMore = false;
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                if(error.name === 'AbortError'){
+                    console.error("[-] Fetch request to Apple aborted due to 5-minute timeout.");
+                    break;
+                }else{
+                    throw error;
+                }
             }
         }
 

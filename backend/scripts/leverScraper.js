@@ -22,73 +22,91 @@ const scrapeLeverJobs = async () => {
             console.log(`\n Checking ${company.toUpperCase()}...`);
     
             const apiUrl = `https://api.lever.co/v0/postings/${company}?mode=json`;
-            
-            const response = await fetch(apiUrl);
-            if (!response.ok) {
-                console.log(`[-] ${company} API returned ${response.status}. Tenant ID might differ. Skipping.`);
-                continue;
-            }
 
-
-            const jobsData = await response.json();
-
-            if (!jobsData || jobsData.length === 0) {
-                console.log(`[-] No jobs found on ${company}.`);
-                continue;
-            }
-
-        
-            const techJobs = jobsData.filter(job => {
-                const title = (job.text || '').toLowerCase();
-                const location = (job.categories?.location || '').toLowerCase();
-                
-                const isEngineer = title.includes('engineer') || title.includes('developer');
-                const isIndia = location.includes('india') || 
-                                location.includes('bengaluru') || 
-                                location.includes('bangalore') || 
-                                location.includes('hyderabad') || 
-                                location.includes('mumbai') ||
-                                location.includes('pune') ||
-                                location.includes('noida') ||
-                                location.includes('gurugram') ||
-                                location.includes('gurgaon');
-
-                const isTooSenior = 
-                    title.includes('manager') || 
-                    title.includes('director') || 
-                    title.includes('vp') || 
-                    title.includes('vice president') || 
-                    title.includes('principal') ||
-                    title.includes('head');
-                
-                return isEngineer && isIndia && !isTooSenior;
-            });
-
-            if (techJobs.length === 0) {
-                console.log(`[-] Found jobs for ${company}, but none matched the India Engineering filter.`);
-                continue;
-            }
-
-            const formattedJobs = techJobs.map(job => ({
-                companyName: (company == 'razorpaysoftwareprivatelimited') ? 'Razorpay' : (company == 'towerresearchcapital') ? 'Tower Research Capital' : company.charAt(0).toUpperCase() + company.slice(1),
-                role: String(job.text),
-                location: String(job.categories?.location || 'India'),
-                applyLink: String(job.hostedUrl), 
-                salaryRaw: "N/A" 
-            }));
+            const controller = new AbortController();
+            const timeoutID = setTimeout(() => {
+                controller.abort();
+            }, 300000);
 
             let addedCount = 0;
-            for (const job of formattedJobs) {
-                const existingJob = await JobPosting.findOne({ applyLink: job.applyLink });
-                if (!existingJob) {
-                    await JobPosting.create(job);
-                    addedCount++;
-                    totalAdded++;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    signal : controller.signal
+                });
+    
+                clearTimeout(timeoutID);
+                if (!response.ok) {
+                    console.log(`[-] ${company} API returned ${response.status}. Tenant ID might differ. Skipping.`);
+                    continue;
+                }
+    
+    
+                const jobsData = await response.json();
+    
+                if (!jobsData || jobsData.length === 0) {
+                    console.log(`[-] No jobs found on ${company}.`);
+                    continue;
+                }
+    
+            
+                const techJobs = jobsData.filter(job => {
+                    const title = (job.text || '').toLowerCase();
+                    const location = (job.categories?.location || '').toLowerCase();
+                    
+                    const isEngineer = title.includes('engineer') || title.includes('developer');
+                    const isIndia = location.includes('india') || 
+                                    location.includes('bengaluru') || 
+                                    location.includes('bangalore') || 
+                                    location.includes('hyderabad') || 
+                                    location.includes('mumbai') ||
+                                    location.includes('pune') ||
+                                    location.includes('noida') ||
+                                    location.includes('gurugram') ||
+                                    location.includes('gurgaon');
+    
+                    const isTooSenior = 
+                        title.includes('manager') || 
+                        title.includes('director') || 
+                        title.includes('vp') || 
+                        title.includes('vice president') || 
+                        title.includes('principal') ||
+                        title.includes('head');
+                    
+                    return isEngineer && isIndia && !isTooSenior;
+                });
+    
+                if (techJobs.length === 0) {
+                    console.log(`[-] Found jobs for ${company}, but none matched the India Engineering filter.`);
+                    continue;
+                }
+    
+                const formattedJobs = techJobs.map(job => ({
+                    companyName: (company == 'razorpaysoftwareprivatelimited') ? 'Razorpay' : (company == 'towerresearchcapital') ? 'Tower Research Capital' : company.charAt(0).toUpperCase() + company.slice(1),
+                    role: String(job.text),
+                    location: String(job.categories?.location || 'India'),
+                    applyLink: String(job.hostedUrl), 
+                    salaryRaw: "N/A" 
+                }));
+    
+                
+                for (const job of formattedJobs) {
+                    const existingJob = await JobPosting.findOne({ applyLink: job.applyLink });
+                    if (!existingJob) {
+                        await JobPosting.create(job);
+                        addedCount++;
+                        totalAdded++;
+                    }
+                }
+            } catch (error) {
+                if(error.name === 'AbortError'){
+                    console.error("[-] Fetch request to Apple aborted due to 5-minute timeout.");
+                    break;
+                }else{
+                    throw error;
                 }
             }
-
             console.log(`[+] Added ${addedCount} new jobs for ${company}.`);
-
         } catch (error) {
             console.error(`Failed to process ${company}:`, error.message);
         }

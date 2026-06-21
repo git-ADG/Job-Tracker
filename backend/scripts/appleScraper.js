@@ -34,87 +34,103 @@ const scrapeAppleJobs = async () => {
                 sort: "relevance"
             };
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json',
-                    'Origin': 'https://jobs.apple.com',
-                    'Referer': 'https://jobs.apple.com/en-in/search?sort=relevance&location=india-INDC',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                },
-                body: JSON.stringify(payload)
-            });
+            const controller = new AbortController();
+            const timeoutID = setTimeout(() => {
+                controller.abort();
+            }, 300000);
 
-            if (!response.ok) {
-                console.error(`Apple API rejected request with status: ${response.status}`);
-                break;
-            }
-
-            const jsonResponse = await response.json();
-            console.log(jsonResponse.searchResults);
-            const jobs = jsonResponse.searchResults || jsonResponse.positions || [];
-
-            if (jobs.length === 0) {
-                hasMore = false;
-                break;
-            }
-
-            totalJobsFound += jobs.length;
-
-            for (const job of jobs) {
-                const title = (job.postingTitle || job.title || job.name || '').toLowerCase();
-                const rawJobString = JSON.stringify(job).toLowerCase();
-
-                const isEngineering = 
-                    title.includes('software') || 
-                    title.includes('engineer') || 
-                    title.includes('developer') || 
-                    title.includes('sde') || 
-                    title.includes('mts') || 
-                    title.includes('architect') ||
-                    title.includes('data') ||
-                    rawJobString.includes('engineering');
-
-                const isIndia = 
-                    rawJobString.includes('india') || 
-                    rawJobString.includes('bengaluru') || 
-                    rawJobString.includes('bangalore') || 
-                    rawJobString.includes('hyderabad');
-
-                if (isEngineering && isIndia) {
-                    const jobId = job.id || job.jobId || job.positionId;
-                    if (!jobId) continue;
-
-                    const jobUrl = `https://jobs.apple.com/en-in/details/${jobId}`;
-                    const exists = await JobPosting.findOne({ portalLink: jobUrl });
-
-                    if (!exists) {
-                        let locStr = 'India';
-                        if (Array.isArray(job.locations) && job.locations[0]) {
-                            locStr = `${job.locations[0].city || 'India'}, ${job.locations[0].countryName || ''}`;
-                        } else if (job.location) {
-                            locStr = job.location;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json, text/plain, */*',
+                        'Content-Type': 'application/json',
+                        'Origin': 'https://jobs.apple.com',
+                        'Referer': 'https://jobs.apple.com/en-in/search?sort=relevance&location=india-INDC',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    },
+                    body: JSON.stringify(payload),
+                    signal : controller.signal
+                });
+                clearTimeout(timeoutID);
+    
+                if (!response.ok) {
+                    console.error(`Apple API rejected request with status: ${response.status}`);
+                    break;
+                }
+    
+                const jsonResponse = await response.json();
+                console.log(jsonResponse.searchResults);
+                const jobs = jsonResponse.searchResults || jsonResponse.positions || [];
+    
+                if (jobs.length === 0) {
+                    hasMore = false;
+                    break;
+                }
+    
+                totalJobsFound += jobs.length;
+    
+                for (const job of jobs) {
+                    const title = (job.postingTitle || job.title || job.name || '').toLowerCase();
+                    const rawJobString = JSON.stringify(job).toLowerCase();
+    
+                    const isEngineering = 
+                        title.includes('software') || 
+                        title.includes('engineer') || 
+                        title.includes('developer') || 
+                        title.includes('sde') || 
+                        title.includes('mts') || 
+                        title.includes('architect') ||
+                        title.includes('data') ||
+                        rawJobString.includes('engineering');
+    
+                    const isIndia = 
+                        rawJobString.includes('india') || 
+                        rawJobString.includes('bengaluru') || 
+                        rawJobString.includes('bangalore') || 
+                        rawJobString.includes('hyderabad');
+    
+                    if (isEngineering && isIndia) {
+                        const jobId = job.id || job.jobId || job.positionId;
+                        if (!jobId) continue;
+    
+                        const jobUrl = `https://jobs.apple.com/en-in/details/${jobId}`;
+                        const exists = await JobPosting.findOne({ portalLink: jobUrl });
+    
+                        if (!exists) {
+                            let locStr = 'India';
+                            if (Array.isArray(job.locations) && job.locations[0]) {
+                                locStr = `${job.locations[0].city || 'India'}, ${job.locations[0].countryName || ''}`;
+                            } else if (job.location) {
+                                locStr = job.location;
+                            }
+    
+                            await JobPosting.create({
+                                companyName: 'Apple',
+                                role: job.postingTitle || job.title || 'Software Engineer',
+                                location: locStr,
+                                salary: 'Competitive',
+                                applyLink: jobUrl,
+                                postedDate: job.jobArrivalDate ? new Date(job.jobArrivalDate) : new Date()
+                            });
+                            jobsAdded++;
                         }
-
-                        await JobPosting.create({
-                            companyName: 'Apple',
-                            role: job.postingTitle || job.title || 'Software Engineer',
-                            location: locStr,
-                            salary: 'Competitive',
-                            applyLink: jobUrl,
-                            postedDate: job.jobArrivalDate ? new Date(job.jobArrivalDate) : new Date()
-                        });
-                        jobsAdded++;
                     }
                 }
-            }
-
-            const totalRecords = jsonResponse.totalRecords || 0;
-            if (totalJobsFound >= totalRecords || jobs.length === 0) {
-                hasMore = false;
-            } else {
-                page++;
+    
+                const totalRecords = jsonResponse.totalRecords || 0;
+                if (totalJobsFound >= totalRecords || jobs.length === 0) {
+                    hasMore = false;
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                if(error.name === 'AbortError'){
+                    console.error("[-] Fetch request to Apple aborted due to 5-minute timeout.");
+                    break;
+                }else{
+                    throw error;
+                }
             }
         }
 
