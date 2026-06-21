@@ -1,4 +1,5 @@
 const axios = require('axios');
+axios.defaults.timeout = 300000;
 const https = require('https');
 const crypto = require('crypto');
 const cheerio = require('cheerio'); // Added Cheerio
