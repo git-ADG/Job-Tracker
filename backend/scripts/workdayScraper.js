@@ -91,6 +91,7 @@ const scrapeWorkdayJobs = async () => {
                 });
 
                 const jobsData = response.data.jobPostings || [];
+                const totalAvailable = response.data.total || 0; 
 
                 if (jobsData.length === 0) {
                     hasMore = false;
@@ -161,7 +162,7 @@ const scrapeWorkdayJobs = async () => {
                 }
 
                 offset += limit;
-                if (jobsData.length < limit) {
+                if (jobsData.length < limit || offset >= totalAvailable || offset >= 1500) {
                     hasMore = false; 
                 }
             }
@@ -177,4 +178,3 @@ const scrapeWorkdayJobs = async () => {
 };
 
 module.exports = scrapeWorkdayJobs;
-// scrapeWorkdayJobs();
